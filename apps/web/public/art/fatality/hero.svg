@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" fill="none">
+  <title>Hero placeholder  replace with hero.png</title>
+  <rect width="200" height="280" rx="12" fill="#1a0a12"/>
+  <text x="100" y="24" text-anchor="middle" fill="#ffe27a" font-family="Arial" font-size="11" font-weight="700">HERO � DROP hero.png</text>
+  <!-- head -->
+  <circle cx="100" cy="70" r="32" fill="#f5c49a"/>
+  <circle cx="88" cy="66" r="4" fill="#1a0a12"/>
+  <circle cx="112" cy="66" r="4" fill="#1a0a12"/>
+  <!-- hair -->
+  <path d="M68 60 Q100 20 132 60 Q120 48 100 48 Q80 48 68 60" fill="#2a1a14"/>
+  <!-- body -->
+  <path d="M70 110 L130 110 L145 200 L55 200 Z" fill="#ff3b5c"/>
+  <path d="M55 200 L145 200 L140 250 L60 250 Z" fill="#1a0a12"/>
+  <!-- arms -->
+  <path d="M70 120 L40 170 L55 175 L80 130" fill="#f5c49a"/>
+  <path d="M130 120 L170 155 L158 168 L125 135" fill="#f5c49a"/>
+  <!-- glow fist -->
+  <circle cx="168" cy="158" r="14" fill="#ffe27a" opacity="0.9"/>
+  <text x="100" y="272" text-anchor="middle" fill="#ff3b5c" font-family="Arial" font-size="13" font-weight="800">CODER</text>
+</svg>

@@ -1,0 +1,456 @@
+/* Learning mode â€” clean, readable, education-first (no rank/XP chrome) */
+
+.learn-app {
+  min-height: 100vh;
+  background: linear-gradient(165deg, #0c0c14 0%, #12121c 40%, #0a0a10 100%);
+  color: #e8e6f0;
+  padding: 0 1rem 2rem;
+}
+
+.quest-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.quest-nav--map {
+  justify-content: space-between;
+}
+
+.quest-nav__right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.quest-nav__btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.quest-nav__back,
+.quest-nav__link {
+  font-family: var(--font-hud);
+  font-size: 0.95rem;
+  color: #a8a4b8;
+  text-decoration: none;
+}
+
+.quest-nav__back:hover,
+.quest-nav__link:hover {
+  color: #ff6b9d;
+}
+
+.quest-nav__brand {
+  font-family: var(--font-impact);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: #ffe27a;
+  text-decoration: none;
+}
+
+.quest-nav__progress {
+  margin-left: auto;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #7a7690;
+  text-transform: uppercase;
+}
+
+.learn-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr minmax(300px, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .learn-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.learn-panel {
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.learn-panel__chapter {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ff6b9d;
+  margin-bottom: 0.35rem;
+}
+
+.learn-panel__title {
+  font-family: var(--font-hud);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+  color: #fff;
+}
+
+.learn-panel__hook {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: #c4b8e8;
+  line-height: 1.45;
+}
+
+.mentor-bubble {
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.12), rgba(120, 90, 255, 0.12));
+  border: 1px solid rgba(255, 107, 157, 0.35);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mentor-bubble__name {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ff6b9d;
+  margin-bottom: 0.5rem;
+}
+
+.mentor-bubble__line {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #e8e6f0;
+}
+
+.mentor-bubble__line:last-child {
+  margin-bottom: 0;
+}
+
+.learn-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.learn-box__heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7a7690;
+}
+
+.learn-box__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #c8c4d4;
+}
+
+.learn-box--mission {
+  border-color: rgba(255, 226, 122, 0.28);
+  background: linear-gradient(135deg, rgba(255, 59, 92, 0.12), rgba(255, 226, 122, 0.06));
+}
+
+.learn-box__real {
+  margin-top: 0.55rem !important;
+  font-size: 0.82rem !important;
+}
+
+.tag-academy {
+  margin-bottom: 1rem;
+}
+
+.tag-card {
+  background: #16161f;
+  border: 1px solid rgba(126, 200, 255, 0.25);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.tag-card__tag {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: #7ec8ff;
+  background: rgba(126, 200, 255, 0.1);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  margin-bottom: 0.35rem;
+}
+
+.tag-card__purpose,
+.tag-card__why,
+.tag-card__when,
+.tag-card__mistake {
+  margin: 0.35rem 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #b8b4c8;
+}
+
+.tag-card__purpose strong,
+.tag-card__why strong,
+.tag-card__when strong,
+.tag-card__mistake strong,
+.tag-card__attrs strong {
+  color: #f0ecff;
+}
+
+.tag-card__attrs {
+  margin: 0.45rem 0;
+  font-size: 0.84rem;
+  color: #b8b4c8;
+}
+
+.tag-card__attrs ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.tag-card__attrs li {
+  margin: 0.2rem 0;
+}
+
+.tag-card__attrs code {
+  color: #7ec8ff;
+}
+
+.tag-card__mistake {
+  color: #ffb4c0;
+}
+
+.tag-card__example {
+  margin: 0.45rem 0 0;
+  padding: 0.5rem;
+  font-size: 0.78rem;
+  background: #0a0a10;
+  border-radius: 4px;
+  color: #9ef0c0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.mission-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mission-list li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.4rem 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mission-list__icon {
+  flex-shrink: 0;
+  color: #7a7690;
+}
+
+.mission-list__done {
+  color: #9ef0c0;
+}
+
+.mission-list__done .mission-list__icon {
+  color: #5dff9f;
+}
+
+.learn-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.learn-workspace__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.learn-workspace__label {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #7a7690;
+}
+
+.learn-workspace__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editor-wrap--learn {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.learn-template {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  background: #0a0a10;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: auto;
+}
+
+.learn-toast {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.learn-toast--win {
+  background: rgba(93, 255, 159, 0.12);
+  border: 1px solid rgba(93, 255, 159, 0.45);
+  color: #c9ffd8;
+}
+
+.learn-toast--fail {
+  background: rgba(255, 107, 157, 0.1);
+  border: 1px solid rgba(255, 107, 157, 0.35);
+  color: #ffc8d8;
+}
+
+.learn-toast__next {
+  display: block;
+  margin-top: 0.65rem;
+  background: transparent;
+  border: none;
+  color: #ffe27a;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0;
+}
+
+.learn-preview-col__title {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7a7690;
+}
+
+.learn-preview-col__sub {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #8a8698;
+}
+
+.clean-preview__chips {
+  margin-bottom: 0.65rem;
+}
+
+.clean-preview__chips-label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a7690;
+  margin-bottom: 0.35rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag-chip {
+  font-size: 0.75rem;
+  font-family: Consolas, monospace;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(126, 200, 255, 0.15);
+  color: #7ec8ff;
+  border: 1px solid rgba(126, 200, 255, 0.3);
+}
+
+.clean-preview__status {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: #9ef0c0;
+}
+
+.clean-preview__frame {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.clean-preview__frame iframe {
+  width: 100%;
+  min-height: 420px;
+  border: none;
+  display: block;
+}
+
+.chapter-row__num {
+  font-size: 0.75rem;
+  color: #ff6b9d;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.tier-block {
+  margin-bottom: 1.75rem;
+}
+
+.tier-block__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(255, 107, 157, 0.25);
+}
+
+.tier-block__title {
+  margin: 0;
+  font-family: var(--font-impact);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  color: #ffe27a;
+}
+
+.tier-block__meta {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: #9ef0c0;
+}
+
+.tier-block__lock-msg {
+  color: #8a8698;
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem;
+}
+
+.quest-row--locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

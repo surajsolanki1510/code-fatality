@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: codefatality-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: codefatality
+    ports:
+      - "5432:5432"
+    volumes:
+      - codefatality_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d codefatality"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  codefatality_pg:
