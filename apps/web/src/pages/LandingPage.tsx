@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArenaButton, ArenaShell } from '../components/ArenaShell'
 import { BRAND } from '../config/brand'
@@ -7,6 +8,13 @@ import { useProgressStore } from '../store/progressStore'
 export function LandingPage() {
   const navigate = useNavigate()
   const completed = useProgressStore((s) => s.completedQuestIds.length)
+  const user = useProgressStore((s) => s.user)
+  const isRegistered = Boolean(user && !user.isGuest)
+
+  useEffect(() => {
+    document.documentElement.classList.add('landing-lock')
+    return () => document.documentElement.classList.remove('landing-lock')
+  }, [])
 
   return (
     <ArenaShell cinematic bgImage="/art/landing-arena.jpg">
@@ -72,8 +80,8 @@ export function LandingPage() {
             >
               {completed > 0 ? 'CONTINUE' : BRAND.pressStart}
             </ArenaButton>
-            <ArenaButton variant="ghost" className="landing-cta" onClick={() => navigate('/auth')}>
-              SIGN IN / SAVE ACCOUNT
+            <ArenaButton variant="ghost" className="landing-cta landing-cta--auth" onClick={() => navigate('/auth')}>
+              {isRegistered ? 'PROFILE' : 'LOGIN'}
             </ArenaButton>
           </motion.div>
         </div>

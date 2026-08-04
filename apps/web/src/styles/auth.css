@@ -1,6 +1,6 @@
 .auth-page {
   width: min(440px, 92vw);
-  margin: 8vh auto 0;
+  margin: 6vh auto 0;
   padding: 1.5rem;
   border: 1px solid rgba(255, 226, 122, 0.28);
   border-radius: 16px;
@@ -14,11 +14,37 @@
   font-size: 0.85rem;
 }
 
+.auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 0.9rem 0 0.75rem;
+}
+
+.auth-tabs button {
+  border: 1px solid rgba(255, 226, 122, 0.28);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  padding: 0.45rem 0.55rem;
+  font-family: var(--font-cyber, Orbitron, system-ui, sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.auth-tabs button.is-active {
+  background: linear-gradient(180deg, #ffe27a, #d4af37);
+  color: #1a1208;
+  border-color: transparent;
+  font-weight: 800;
+}
+
 .auth-page__title {
-  margin: 0.85rem 0 0.35rem;
+  margin: 0.35rem 0 0.35rem;
   font-family: var(--font-impact, Impact, sans-serif);
   letter-spacing: 0.06em;
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-size: clamp(1.5rem, 4vw, 2rem);
   color: #fff;
 }
 
@@ -57,25 +83,19 @@
   font-weight: 700;
 }
 
-.auth-page__switch {
-  display: grid;
-  gap: 0.45rem;
-  margin-top: 1rem;
-}
-
-.auth-page__switch button,
 .auth-page__guest {
+  margin-top: 1rem;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffe27a;
+  font-weight: 700;
   cursor: pointer;
   text-align: left;
   padding: 0;
   font: inherit;
 }
 
-.auth-page__guest {
-  margin-top: 1rem;
-  color: #ffe27a;
-  font-weight: 700;
+.auth-page__guest:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }

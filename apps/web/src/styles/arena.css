@@ -33,6 +33,17 @@ body,
   margin: 0;
 }
 
+/* Lock landing to one viewport — no phone scroll bounce */
+html.landing-lock,
+html.landing-lock body,
+html.landing-lock #root {
+  height: 100%;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
 body {
   font-family: var(--font-hud);
   font-weight: 600;
@@ -53,6 +64,9 @@ button {
 }
 
 .arena-app--cinematic {
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 100dvh;
   overflow: hidden;
 }
 
@@ -613,15 +627,26 @@ button {
 .landing-actions {
   display: flex;
   justify-content: center;
+  align-items: stretch;
+  gap: 0.55rem;
+  flex-wrap: nowrap;
   margin-top: 0.15rem;
+  width: 100%;
+  max-width: 22rem;
 }
 
 .landing-cta.arena-btn,
 .landing-actions .landing-cta {
-  min-height: 52px;
-  padding: 0.85rem clamp(1.6rem, 5vw, 2.75rem);
+  flex: 1 1 0;
+  min-height: 48px;
+  min-width: 0;
+  padding: 0.75rem 0.9rem;
   font-size: var(--landing-cta);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
+}
+
+.landing-cta--auth {
+  white-space: nowrap;
 }
 
 /* Wide desktop — taller fighters, wider gutter */
@@ -647,24 +672,59 @@ button {
 /* iPhone 12 Pro class (~390×844) and similar */
 @media (max-width: 430px) {
   .landing-hero {
-    --landing-gutter: clamp(4.75rem, 24vw, 7.5rem);
-    --landing-fighter-h: clamp(240px, 48dvh, 420px);
-    --landing-title: clamp(3.15rem, 11.5vw, 3.75rem);
-    --landing-tag: clamp(0.8rem, 2.4vw, 0.9rem);
-    --landing-cta: clamp(1.05rem, 3.4vw, 1.15rem);
+    --landing-gutter: clamp(3.5rem, 20vw, 6rem);
+    --landing-fighter-h: clamp(160px, 38dvh, 280px);
+    --landing-title: clamp(2.55rem, 10vw, 3.2rem);
+    --landing-tag: clamp(0.72rem, 2.2vw, 0.84rem);
+    --landing-cta: clamp(0.92rem, 3vw, 1.05rem);
+    grid-template-rows: minmax(0, 0.7fr) auto minmax(0, 1.1fr);
   }
 
   .landing-copy {
-    width: min(100%, calc(100% - 1.25rem));
-    gap: 0.75rem;
+    width: min(100%, calc(100% - 1rem));
+    gap: 0.55rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .landing-tagline {
+    max-width: 24ch;
+    letter-spacing: 0.08em;
+  }
+
+  .landing-actions {
+    max-width: 18.5rem;
+    gap: 0.4rem;
+  }
+
+  .landing-cta.arena-btn,
+  .landing-actions .landing-cta {
+    min-height: 44px;
+    padding: 0.65rem 0.7rem;
   }
 
   .landing-fighter--you img {
-    margin-left: -0.75rem;
+    margin-left: -0.5rem;
   }
 
   .landing-fighter--fear img {
-    margin-right: -0.75rem;
+    margin-right: -0.5rem;
+  }
+}
+
+/* Very short phones / browser chrome eating height */
+@media (max-height: 760px) and (max-width: 480px) {
+  .landing-hero {
+    --landing-fighter-h: clamp(140px, 32dvh, 220px);
+    --landing-title: clamp(2.2rem, 9vw, 2.9rem);
+  }
+
+  .landing-copy {
+    gap: 0.4rem;
+    padding-block: 0.4rem;
+  }
+
+  .landing-tagline {
+    display: none;
   }
 }
 

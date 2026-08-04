@@ -42,24 +42,60 @@ export function AuthPage() {
         <Link to="/" className="auth-page__back">
           ← Back
         </Link>
+
+        <div className="auth-tabs" role="tablist" aria-label="Auth mode">
+          <button
+            type="button"
+            role="tab"
+            className={mode === 'login' ? 'is-active' : ''}
+            aria-selected={mode === 'login'}
+            onClick={() => setMode('login')}
+          >
+            LOGIN
+          </button>
+          <button
+            type="button"
+            role="tab"
+            className={mode === 'signup' ? 'is-active' : ''}
+            aria-selected={mode === 'signup'}
+            onClick={() => setMode('signup')}
+          >
+            JOIN
+          </button>
+          {user?.isGuest && (
+            <button
+              type="button"
+              role="tab"
+              className={mode === 'claim' ? 'is-active' : ''}
+              aria-selected={mode === 'claim'}
+              onClick={() => setMode('claim')}
+            >
+              SAVE
+            </button>
+          )}
+        </div>
+
         <h1 className="auth-page__title">
-          {mode === 'login' ? 'SIGN IN' : mode === 'signup' ? 'CREATE ACCOUNT' : 'SAVE YOUR PROGRESS'}
+          {mode === 'login' ? 'LOGIN' : mode === 'signup' ? 'JOIN THE ARENA' : 'SAVE RUN'}
         </h1>
         <p className="auth-page__sub">
           {mode === 'claim'
-            ? 'Turn this guest run into a real account so progress survives any device.'
-            : 'Your progress syncs to the database — ready for real players.'}
+            ? 'Keep this guest progress on a real account.'
+            : mode === 'login'
+              ? 'Welcome back, warrior. Enter email + password.'
+              : 'Create your fighter ID. Progress syncs to the cloud.'}
         </p>
 
         <form className="auth-form" onSubmit={onSubmit}>
           {(mode === 'signup' || mode === 'claim') && (
             <label>
-              Display name
+              Fighter name
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Nova"
                 maxLength={40}
+                autoComplete="nickname"
               />
             </label>
           )}
@@ -90,31 +126,20 @@ export function AuthPage() {
           {error && <p className="auth-form__error">{error}</p>}
 
           <ArenaButton type="submit" variant="gold" disabled={busy}>
-            {busy ? 'Working…' : mode === 'login' ? 'Sign in' : mode === 'signup' ? 'Create account' : 'Save account'}
+            {busy
+              ? 'Working…'
+              : mode === 'login'
+                ? 'LOGIN'
+                : mode === 'signup'
+                  ? 'CREATE ID'
+                  : 'SAVE PROGRESS'}
           </ArenaButton>
         </form>
-
-        <div className="auth-page__switch">
-          {mode !== 'login' && (
-            <button type="button" onClick={() => setMode('login')}>
-              Have an account? Sign in
-            </button>
-          )}
-          {mode !== 'signup' && (
-            <button type="button" onClick={() => setMode('signup')}>
-              New here? Create account
-            </button>
-          )}
-          {user?.isGuest && mode !== 'claim' && (
-            <button type="button" onClick={() => setMode('claim')}>
-              Save this guest progress
-            </button>
-          )}
-        </div>
 
         <button
           type="button"
           className="auth-page__guest"
+          disabled={busy}
           onClick={async () => {
             setBusy(true)
             const err = await playAsGuest()
@@ -123,7 +148,7 @@ export function AuthPage() {
             else navigate('/map')
           }}
         >
-          Continue as guest
+          Skip — play as guest
         </button>
       </div>
     </ArenaShell>
