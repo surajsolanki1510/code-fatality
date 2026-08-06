@@ -1,6 +1,7 @@
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import pngToIco from 'png-to-ico'
 import sharp from 'sharp'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -14,16 +15,18 @@ const svg = Buffer.from(`
 </svg>`)
 
 async function writePng(name, size) {
-  await sharp(svg).resize(size, size).png().toFile(join(outDir, name))
+  const path = join(outDir, name)
+  await sharp(svg).resize(size, size).png().toFile(path)
+  return path
 }
 
-await writePng('32x32.png', 32)
-await writePng('128x128.png', 128)
+const png32 = await writePng('32x32.png', 32)
+const png128 = await writePng('128x128.png', 128)
 await writePng('henry.w@example.net', 256)
-await sharp(svg).resize(512, 512).png().toFile(join(outDir, 'icon.png'))
+const png512 = await writePng('icon.png', 512)
+await writePng('icon.icns', 512)
 
-// Minimal ICO/ICNS placeholders as PNG copies for first builds; replace later for store polish.
-await sharp(svg).resize(256, 256).png().toFile(join(outDir, 'icon.ico'))
-await sharp(svg).resize(512, 512).png().toFile(join(outDir, 'icon.icns'))
+const ico = await pngToIco([png32, png128, png512])
+writeFileSync(join(outDir, 'icon.ico'), ico)
 
-console.log('Tauri icons written to src-tauri/icons')
+console.log('Tauri icons written to src-tauri/icons (valid ICO)')

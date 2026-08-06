@@ -87,6 +87,7 @@ jobs:
   release:
     name: Publish Downloads
     needs: [android, windows]
+    if: always() && needs.android.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -97,8 +98,8 @@ jobs:
         run: |
           mkdir -p out
           find artifacts -type f -name '*.apk' -exec cp {} out/CODE-FATALITY-android.apk \;
-          find artifacts -type f -name '*.msi' -exec cp {} out/CODE-FATALITY-windows.msi \;
-          find artifacts -type f -name '*.exe' -exec cp {} out/CODE-FATALITY-windows-setup.exe \;
+          find artifacts -type f -name '*.msi' -exec cp {} out/CODE-FATALITY-windows.msi \; || true
+          find artifacts -type f -name '*.exe' -exec cp {} out/CODE-FATALITY-windows-setup.exe \; || true
           ls -la out
 
       - name: Create GitHub Release
@@ -110,7 +111,7 @@ jobs:
             Free downloadable builds:
 
             - **Android:** `CODE-FATALITY-android.apk`
-            - **Windows:** `CODE-FATALITY-windows-setup.exe` / `.msi`
+            - **Windows:** `CODE-FATALITY-windows-setup.exe` / `.msi` (when available)
 
             API: https://code-fatality.onrender.com
             Web: https://code-fatality.vercel.app
