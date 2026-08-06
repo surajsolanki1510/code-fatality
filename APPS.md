@@ -1,9 +1,17 @@
 # CODE FATALITY — Free Apps + Free Hosting
 
-## Goal
-- Free downloadable **Android APK** + **Windows EXE**
-- Free-friendly backend (Neon + Render + Vercel)
-- No Play/App Store fees in this phase
+## Free downloads (GitHub Actions)
+
+1. Open: https://github.com/surajsolanki1510/code-fatality/actions
+2. Workflow: **Build Free App Downloads**
+3. Click **Run workflow** → **Run workflow**
+4. Wait ~10–20 minutes
+5. Open Releases: https://github.com/surajsolanki1510/code-fatality/releases
+6. Download:
+   - `CODE-FATALITY-android.apk`
+   - `CODE-FATALITY-windows-setup.exe`
+
+Landing page **GET APP** also links to Releases.
 
 ## 1) Free API on Render (replace Railway trial)
 
