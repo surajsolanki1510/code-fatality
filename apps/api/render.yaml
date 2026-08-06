@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: code-fatality-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      - key: RATE_LIMIT_MAX
+        value: "120"
+      - key: RATE_LIMIT_WINDOW
+        value: 1 minute

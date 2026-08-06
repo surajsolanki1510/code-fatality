@@ -9,3 +9,7 @@ dist
 .DS_Store
 .vercel
 .railway
+apps/web/android
+apps/web/ios
+apps/web/src-tauri/target
+apps/web/src-tauri/gen

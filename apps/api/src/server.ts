@@ -26,13 +26,35 @@ const app = Fastify({
 })
 
 const corsOriginEnv = process.env.CORS_ORIGIN ?? 'true'
-const corsOrigin =
+const configuredOrigins =
   corsOriginEnv === 'true'
-    ? true
+    ? null
     : corsOriginEnv.split(',').map((v) => v.trim()).filter(Boolean)
 
+const nativeOrigins = [
+  'capacitor://localhost',
+  'http://localhost',
+  'https://localhost',
+  'tauri://localhost',
+  'http://tauri.localhost',
+  'https://tauri.localhost',
+]
+
 await app.register(helmet, { contentSecurityPolicy: false })
-await app.register(cors, { origin: corsOrigin, credentials: true })
+await app.register(cors, {
+  origin: (origin, cb) => {
+    // Non-browser / same-origin tools
+    if (!origin) return cb(null, true)
+    if (configuredOrigins === null) return cb(null, true)
+    if (configuredOrigins.includes(origin) || nativeOrigins.includes(origin)) {
+      return cb(null, true)
+    }
+    // Capacitor Android sometimes uses http://localhost:<port>
+    if (/^https?:\/\/localhost(?::\d+)?$/i.test(origin)) return cb(null, true)
+    return cb(null, false)
+  },
+  credentials: true,
+})
 await app.register(rateLimit, {
   max: Number(process.env.RATE_LIMIT_MAX ?? 120),
   timeWindow: process.env.RATE_LIMIT_WINDOW ?? '1 minute',

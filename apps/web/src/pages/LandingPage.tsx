@@ -83,6 +83,9 @@ export function LandingPage() {
             <ArenaButton variant="ghost" className="landing-cta landing-cta--auth" onClick={() => navigate('/auth')}>
               {isRegistered ? 'PROFILE' : 'LOGIN'}
             </ArenaButton>
+            <ArenaButton variant="ghost" className="landing-cta landing-cta--auth" onClick={() => navigate('/download')}>
+              GET APP
+            </ArenaButton>
           </motion.div>
         </div>
       </div>

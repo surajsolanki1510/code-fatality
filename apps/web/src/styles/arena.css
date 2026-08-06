@@ -628,11 +628,11 @@ button {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  gap: 0.55rem;
-  flex-wrap: nowrap;
+  gap: 0.45rem;
+  flex-wrap: wrap;
   margin-top: 0.15rem;
   width: 100%;
-  max-width: 22rem;
+  max-width: 26rem;
 }
 
 .landing-cta.arena-btn,
