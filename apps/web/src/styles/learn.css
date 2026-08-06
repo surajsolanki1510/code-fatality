@@ -34,6 +34,11 @@
   font: inherit;
 }
 
+.quest-nav__link--gold {
+  color: #ffe27a;
+  font-weight: 700;
+}
+
 .quest-nav__back,
 .quest-nav__link {
   font-family: var(--font-hud);

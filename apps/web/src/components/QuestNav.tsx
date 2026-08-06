@@ -43,6 +43,9 @@ export function MapNav() {
         <Link to="/map" className="quest-nav__link">
           Realms
         </Link>
+        <Link to="/notebook/html-village" className="quest-nav__link quest-nav__link--gold">
+          Notebook
+        </Link>
         {user?.isGuest === false ? (
           <button type="button" className="quest-nav__link quest-nav__btn" onClick={logout}>
             Log out
