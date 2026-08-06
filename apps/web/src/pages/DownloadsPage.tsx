@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
-const RELEASES = 'https://github.com/surajsolanki1510/code-fatality/releases'
+const LATEST = 'https://github.com/surajsolanki1510/code-fatality/releases/latest/download'
+const RELEASES = 'https://github.com/surajsolanki1510/code-fatality/releases/latest'
 
 export function DownloadsPage() {
   return (
@@ -13,26 +14,49 @@ export function DownloadsPage() {
         DOWNLOAD
       </motion.h1>
       <p className="downloads-page__sub">
-        Free installs. No Play Store / App Store fee in this phase — grab the build from GitHub Releases.
+        Free installs for everyone. Download the latest Android or Windows build — no store account needed.
       </p>
 
       <div className="downloads-grid">
-        <a className="downloads-card" href={RELEASES} target="_blank" rel="noreferrer">
+        <a
+          className="downloads-card"
+          href={`${LATEST}/CODE-FATALITY-android.apk`}
+          target="_blank"
+          rel="noreferrer"
+        >
           <strong>Android APK</strong>
-          <span>Install on phone (allow unknown apps)</span>
+          <span>Tap to download · allow unknown apps</span>
         </a>
-        <a className="downloads-card" href={RELEASES} target="_blank" rel="noreferrer">
+        <a
+          className="downloads-card"
+          href={`${LATEST}/CODE-FATALITY-windows-setup.exe`}
+          target="_blank"
+          rel="noreferrer"
+        >
           <strong>Windows EXE</strong>
           <span>Desktop installer for PC</span>
         </a>
-        <a className="downloads-card downloads-card--muted" href="https://code-fatality.vercel.app" target="_blank" rel="noreferrer">
+        <a
+          className="downloads-card"
+          href={`${LATEST}/CODE-FATALITY-windows.msi`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <strong>Windows MSI</strong>
+          <span>Alternative Windows installer</span>
+        </a>
+        <a className="downloads-card downloads-card--muted" href="https://code-fatality.vercel.app/" rel="noreferrer">
           <strong>Play in Browser</strong>
           <span>Works now on any device</span>
         </a>
       </div>
 
       <p className="downloads-page__note">
-        iOS App Store build needs a Mac + Apple Developer account — not free. Android + Windows downloads are free via Releases.
+        Having trouble? Open the{' '}
+        <a href={RELEASES} target="_blank" rel="noreferrer">
+          latest GitHub release
+        </a>{' '}
+        and download from Assets. iOS App Store builds need a paid Apple Developer account.
       </p>
     </div>
   )
