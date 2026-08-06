@@ -1,10 +1,11 @@
 services:
   - type: web
     name: code-fatality-api
-    runtime: docker
+    runtime: node
     plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    rootDir: apps/api
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
