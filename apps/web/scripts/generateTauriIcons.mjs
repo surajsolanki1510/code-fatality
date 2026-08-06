@@ -11,7 +11,7 @@ mkdirSync(outDir, { recursive: true })
 
 async function writePng(name, size) {
   const path = join(outDir, name)
-  await sharp(logoPath).resize(size, size).png().toFile(path)
+  await sharp(logoPath).resize(size, size, { fit: 'cover' }).png().toFile(path)
   return path
 }
 
@@ -34,10 +34,44 @@ if (existsSync(androidResDir)) {
 
   for (const { folder, size } of androidSizes) {
     const base = join(androidResDir, folder)
-    await sharp(logoPath).resize(size, size).png().toFile(join(base, 'ic_launcher.png'))
-    await sharp(logoPath).resize(size, size).png().toFile(join(base, 'ic_launcher_round.png'))
-    await sharp(logoPath).resize(size, size).png().toFile(join(base, 'ic_launcher_foreground.png'))
+    mkdirSync(base, { recursive: true })
+
+    // Full logo for legacy launcher icons
+    await sharp(logoPath).resize(size, size, { fit: 'cover' }).png().toFile(join(base, 'ic_launcher.png'))
+    await sharp(logoPath).resize(size, size, { fit: 'cover' }).png().toFile(join(base, 'ic_launcher_round.png'))
+
+    // Adaptive foreground: logo inset so Android mask doesn't crop the brand
+    const inset = Math.round(size * 0.18)
+    const inner = Math.max(size - inset * 2, 1)
+    const logo = await sharp(logoPath).resize(inner, inner, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer()
+    await sharp({
+      create: {
+        width: size,
+        height: size,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .composite([{ input: logo, gravity: 'centre' }])
+      .png()
+      .toFile(join(base, 'ic_launcher_foreground.png'))
   }
+
+  // Match brand dark void so adaptive icon doesn't use Capacitor teal/blue
+  const valuesDir = join(androidResDir, 'values')
+  mkdirSync(valuesDir, { recursive: true })
+  writeFileSync(
+    join(valuesDir, 'ic_launcher_background.xml'),
+    `<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#12060c</color>
+</resources>
+`,
+  )
+
+  console.log('Updated Android launcher icons from public/app-logo.png')
+} else {
+  console.log('Android project not present — skipped Android icons')
 }
 
-console.log('Updated Tauri + Android icons from public/app-logo.png')
+console.log('Updated Tauri icons from public/app-logo.png')

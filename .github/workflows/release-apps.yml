@@ -41,6 +41,9 @@ jobs:
           npx cap add android || true
           npx cap sync android
 
+      - name: Apply app logo to Android icons
+        run: npm run icons:tauri
+
       - name: Assemble debug APK
         working-directory: apps/web/android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
