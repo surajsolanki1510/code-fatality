@@ -748,6 +748,7 @@ button {
 
 .map-header .arena-tagline {
   margin-top: 0.5rem;
+  max-width: 68ch;
 }
 
 /* Fighter / world select cards */
@@ -760,7 +761,7 @@ button {
 .fighter-card {
   position: relative;
   isolation: isolate;
-  min-height: 380px;
+  min-height: 330px;
   padding: 0;
   border: 2px solid rgba(47, 47, 61, 0.95);
   background: #0a0a12;
@@ -770,6 +771,99 @@ button {
   color: inherit;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.map-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 1080px) and (min-height: 760px) {
+  .map-page {
+    min-height: calc(100dvh - 8.5rem);
+    overflow: hidden;
+  }
+
+  .map-header {
+    margin-bottom: 0.8rem;
+  }
+
+  .world-select {
+    flex: 1;
+    align-content: stretch;
+    overflow: hidden;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .fighter-card {
+    min-height: 0;
+    height: 100%;
+  }
+}
+
+.notebook-page {
+  width: min(1100px, 96vw);
+  margin: 0 auto;
+}
+
+.notebook-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.4rem 0 1rem;
+}
+
+.notebook-download {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+}
+
+.notebook-paper {
+  position: relative;
+  border-radius: 14px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #f6f1e0 0,
+    #f6f1e0 36px,
+    #dfd7c5 36px,
+    #dfd7c5 37px
+  );
+  border: 2px solid #8b6914;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  min-height: min(72dvh, 780px);
+}
+
+.notebook-paper__rings {
+  position: absolute;
+  left: 0.9rem;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  width: 12px;
+  background:
+    radial-gradient(circle at 6px 14px, #5c4b2f 0 4px, transparent 4px) 0 0 / 12px 36px repeat-y;
+  pointer-events: none;
+}
+
+.notebook-paper__input {
+  width: 100%;
+  min-height: min(72dvh, 780px);
+  border: 0;
+  background: transparent;
+  resize: vertical;
+  color: #24170b;
+  padding: 1rem 1rem 1rem 2.4rem;
+  font: 600 1rem/2.25rem 'Rajdhani', system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  outline: none;
+}
+
+@media (max-width: 760px) {
+  .notebook-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .fighter-card:not(:disabled):hover {

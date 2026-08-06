@@ -16,6 +16,11 @@ export function QuestNav({ worldId, backTo }: { worldId?: string; backTo?: strin
         ← Chapters
       </Link>
       <span className="quest-nav__brand">{BRAND.short}</span>
+      {wId && (
+        <Link to={`/notebook/${wId}`} className="quest-nav__link">
+          Notebook
+        </Link>
+      )}
       {progress && (
         <span className="quest-nav__progress">
           {progress.done}/{progress.total} cleared

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArenaButton, ArenaShell } from '../components/ArenaShell'
 import { useProgressStore } from '../store/progressStore'
@@ -19,6 +19,12 @@ export function AuthPage() {
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (user && !user.isGuest) {
+      navigate('/map', { replace: true })
+    }
+  }, [user, navigate])
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()

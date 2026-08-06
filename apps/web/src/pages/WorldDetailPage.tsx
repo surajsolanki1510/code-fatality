@@ -56,6 +56,11 @@ export function WorldDetailPage() {
               {progress.done}/{progress.total} chapters cleared · unlock one-by-one
             </p>
           )}
+          <p style={{ marginTop: '0.7rem' }}>
+            <Link to={`/notebook/${world.id}`} className="quest-nav__brand">
+              Open {world.name} Notebook →
+            </Link>
+          </p>
         </div>
       </div>
 

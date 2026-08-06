@@ -2,12 +2,10 @@ import { motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArenaButton, ArenaShell } from '../components/ArenaShell'
-import { BRAND } from '../config/brand'
 import { useProgressStore } from '../store/progressStore'
 
 export function LandingPage() {
   const navigate = useNavigate()
-  const completed = useProgressStore((s) => s.completedQuestIds.length)
   const user = useProgressStore((s) => s.user)
   const isRegistered = Boolean(user && !user.isGuest)
 
@@ -76,12 +74,9 @@ export function LandingPage() {
             <ArenaButton
               variant="gold"
               className="arena-btn--pulse landing-cta"
-              onClick={() => navigate('/map')}
+              onClick={() => navigate(isRegistered ? '/map' : '/auth')}
             >
-              {completed > 0 ? 'CONTINUE' : BRAND.pressStart}
-            </ArenaButton>
-            <ArenaButton variant="ghost" className="landing-cta landing-cta--auth" onClick={() => navigate('/auth')}>
-              {isRegistered ? 'PROFILE' : 'LOGIN'}
+              CONTINUE
             </ArenaButton>
             <ArenaButton variant="ghost" className="landing-cta landing-cta--auth" onClick={() => navigate('/download')}>
               GET APP

@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { AuthPage } from './pages/AuthPage'
 import { DownloadsPage } from './pages/DownloadsPage'
 import { LandingPage } from './pages/LandingPage'
+import { NotebookPage } from './pages/NotebookPage'
 import { QuestPage } from './pages/QuestPage'
 import { WorldDetailPage } from './pages/WorldDetailPage'
 import { WorldMapPage } from './pages/WorldMapPage'
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/download" element={<DownloadsPage />} />
         <Route path="/map" element={<WorldMapPage />} />
         <Route path="/world/:worldId" element={<WorldDetailPage />} />
+        <Route path="/notebook/:worldId" element={<NotebookPage />} />
         <Route path="/quest/:questId" element={<QuestPage />} />
       </Routes>
     </BrowserRouter>

@@ -26,8 +26,20 @@ export function QuestPage() {
   const [showVictory, setShowVictory] = useState(false)
   const [lockOutcome, setLockOutcome] = useState<LockOutcome>('idle')
   const [phoneTab, setPhoneTab] = useState<'learn' | 'code'>('learn')
+  const [isPhone, setIsPhone] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 960px)').matches : false,
+  )
   const deferredHtml = useDeferredValue(html)
   const deferredCss = useDeferredValue(css)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const media = window.matchMedia('(max-width: 960px)')
+    const onChange = () => setIsPhone(media.matches)
+    onChange()
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [])
 
   useEffect(() => {
     if (!quest) return
@@ -59,6 +71,24 @@ export function QuestPage() {
   const editorLanguage = quest?.starterCss !== undefined ? 'css' : 'html'
   const editorValue = editorLanguage === 'css' ? css : html
   const setEditorValue = editorLanguage === 'css' ? setCss : setHtml
+
+  const editorOptions = useMemo(
+    () => ({
+      fontFamily: 'Consolas, monospace',
+      fontSize: isPhone ? 13 : 14,
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+      wordWrap: 'on' as const,
+      padding: { top: isPhone ? 6 : 8 },
+      lineNumbers: isPhone ? ('off' as const) : ('on' as const),
+      quickSuggestions: !isPhone,
+      suggestOnTriggerCharacters: !isPhone,
+      folding: !isPhone,
+      smoothScrolling: false,
+      automaticLayout: true,
+    }),
+    [isPhone],
+  )
 
   const chapters = quest ? getQuestsForWorld(quest.worldId) : []
   const chapterIndex = quest ? chapters.findIndex((q) => q.id === quest.id) : -1
@@ -311,26 +341,33 @@ export function QuestPage() {
               })}
             </div>
             <div className="fatality-editor__monaco">
-              <Editor
-                height="100%"
-                language="html"
-                theme="vs-dark"
-                value={html}
-                onChange={(v) => {
-                  setHtml(v ?? '')
-                  if (lockOutcome === 'win') return
-                  setLockOutcome('idle')
-                }}
-                options={{
-                  fontFamily: 'Consolas, monospace',
-                  fontSize: 14,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  wordWrap: 'on',
-                  padding: { top: 8 },
-                  lineNumbers: 'on',
-                }}
-              />
+              {isPhone ? (
+                <textarea
+                  className="fatality-editor__textarea"
+                  value={editorValue}
+                  onChange={(e) => {
+                    setEditorValue(e.target.value)
+                    if (lockOutcome === 'win') return
+                    setLockOutcome('idle')
+                  }}
+                  spellCheck={false}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                />
+              ) : (
+                <Editor
+                  height="100%"
+                  language={editorLanguage}
+                  theme="vs-dark"
+                  value={editorValue}
+                  onChange={(v) => {
+                    setEditorValue(v ?? '')
+                    if (lockOutcome === 'win') return
+                    setLockOutcome('idle')
+                  }}
+                  options={editorOptions}
+                />
+              )}
             </div>
             {feedback && (
               <p className={`fatality-toast fatality-toast--${feedback.type}`}>
@@ -392,21 +429,25 @@ export function QuestPage() {
           </div>
 
           <div className="editor-wrap editor-wrap--learn">
-            <Editor
-              height="420px"
-              language={editorLanguage}
-              theme="vs-dark"
-              value={editorValue}
-              onChange={(v) => setEditorValue(v ?? '')}
-              options={{
-                fontFamily: 'Consolas, monospace',
-                fontSize: 15,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                wordWrap: 'on',
-                padding: { top: 12 },
-              }}
-            />
+            {isPhone ? (
+              <textarea
+                className="fatality-editor__textarea fatality-editor__textarea--learn"
+                value={editorValue}
+                onChange={(e) => setEditorValue(e.target.value)}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoCorrect="off"
+              />
+            ) : (
+              <Editor
+                height="420px"
+                language={editorLanguage}
+                theme="vs-dark"
+                value={editorValue}
+                onChange={(v) => setEditorValue(v ?? '')}
+                options={{ ...editorOptions, fontSize: 15, padding: { top: 12 } }}
+              />
+            )}
           </div>
 
           {quest.starterCss !== undefined && <pre className="learn-template">{quest.starterHtml}</pre>}

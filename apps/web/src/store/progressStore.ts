@@ -106,9 +106,7 @@ export const useProgressStore = create<ProgressState>()(
             })
             return
           }
-
-          const guest = await api<AuthResponse>('/v1/auth/guest', { method: 'POST' })
-          applyAuth(set, guest)
+          set({ booted: true, loading: false })
         } catch {
           set({ booted: true, loading: false })
         }
