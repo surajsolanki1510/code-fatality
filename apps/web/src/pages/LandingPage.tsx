@@ -3,11 +3,13 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArenaButton, ArenaShell } from '../components/ArenaShell'
 import { useProgressStore } from '../store/progressStore'
+import { isNativeApp } from '../utils/platform'
 
 export function LandingPage() {
   const navigate = useNavigate()
   const user = useProgressStore((s) => s.user)
   const isRegistered = Boolean(user && !user.isGuest)
+  const showGetApp = !isNativeApp()
 
   useEffect(() => {
     document.documentElement.classList.add('landing-lock')
@@ -78,9 +80,15 @@ export function LandingPage() {
             >
               CONTINUE
             </ArenaButton>
-            <ArenaButton variant="ghost" className="landing-cta landing-cta--auth" onClick={() => navigate('/download')}>
-              GET APP
-            </ArenaButton>
+            {showGetApp && (
+              <ArenaButton
+                variant="ghost"
+                className="landing-cta landing-cta--auth"
+                onClick={() => navigate('/download')}
+              >
+                GET APP
+              </ArenaButton>
+            )}
           </motion.div>
         </div>
       </div>

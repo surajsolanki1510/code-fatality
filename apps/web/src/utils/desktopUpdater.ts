@@ -1,3 +1,5 @@
+import { isNativeApp } from './platform'
+
 const RELEASES_LATEST_URL = 'https://api.github.com/repos/surajsolanki1510/code-fatality/releases/latest'
 const PROMPTED_BUILD_KEY = 'cf-update-prompted-build'
 
@@ -7,11 +9,7 @@ type LatestRelease = {
 }
 
 function isTauriDesktop() {
-  if (typeof window === 'undefined') {
-    return false
-  }
-
-  return navigator.userAgent.includes('Tauri') || '__TAURI_INTERNALS__' in window
+  return isNativeApp() && (navigator.userAgent.includes('Tauri') || '__TAURI_INTERNALS__' in window)
 }
 
 function parseBuildNumber(tagName?: string) {

@@ -1,10 +1,24 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { isNativeApp } from '../utils/platform'
 
 const LATEST = 'https://github.com/surajsolanki1510/code-fatality/releases/latest/download'
 const RELEASES = 'https://github.com/surajsolanki1510/code-fatality/releases/latest'
 
 export function DownloadsPage() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isNativeApp()) {
+      navigate('/', { replace: true })
+    }
+  }, [navigate])
+
+  if (isNativeApp()) {
+    return null
+  }
+
   return (
     <div className="downloads-page">
       <Link to="/" className="downloads-page__back">
