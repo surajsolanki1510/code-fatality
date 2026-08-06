@@ -181,6 +181,9 @@ export function QuestPage() {
         <header className="fatality-game__nav">
           <Link to={`/world/${quest.worldId}`}>← Chapters</Link>
           <span className="fatality-game__brand">{BRAND.short}</span>
+          <Link to={`/notebook/${quest.worldId}`} className="fatality-game__notebook">
+            Notebook
+          </Link>
           <span className="fatality-game__chap">
             {quest.tier.toUpperCase()} · CH {quest.chapter}
             {quest.kind === 'boss' ? ' · BOSS' : ''}

@@ -72,6 +72,23 @@ body:has(.fatality-game) {
   font-size: 1.05rem;
 }
 
+.fatality-game__notebook {
+  margin-left: 0.35rem;
+  color: var(--f-gold);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 226, 122, 0.35);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.fatality-game__notebook:hover {
+  background: rgba(255, 226, 122, 0.16);
+}
+
 .fatality-game__chap {
   margin-left: auto;
   font-size: 0.75rem;

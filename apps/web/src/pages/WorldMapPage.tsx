@@ -11,8 +11,8 @@ export function WorldMapPage() {
   const completedQuestIds = useProgressStore((s) => s.completedQuestIds)
 
   useEffect(() => {
-    document.documentElement.classList.add('map-lock')
-    return () => document.documentElement.classList.remove('map-lock')
+    document.documentElement.classList.add('viewport-lock')
+    return () => document.documentElement.classList.remove('viewport-lock')
   }, [])
 
   return (
