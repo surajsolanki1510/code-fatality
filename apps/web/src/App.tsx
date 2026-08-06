@@ -7,6 +7,7 @@ import { QuestPage } from './pages/QuestPage'
 import { WorldDetailPage } from './pages/WorldDetailPage'
 import { WorldMapPage } from './pages/WorldMapPage'
 import { useProgressStore } from './store/progressStore'
+import { checkDesktopUpdate } from './utils/desktopUpdater'
 import './styles/arena.css'
 import './styles/learn.css'
 import './styles/fatality.css'
@@ -19,6 +20,10 @@ export default function App() {
   useEffect(() => {
     void bootProgress()
   }, [bootProgress])
+
+  useEffect(() => {
+    void checkDesktopUpdate()
+  }, [])
 
   return (
     <BrowserRouter>
