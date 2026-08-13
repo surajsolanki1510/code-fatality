@@ -28,12 +28,11 @@ export const WORLDS: WorldDef[] = [
     id: 'css-forest',
     name: 'CSS Forest',
     subtitle: 'REALM II — STYLE',
-    description: 'Paint the realm with color, Flexbox, Grid, and motion.',
+    description: 'STYLE FORGE — dress a neon runway with CSS. Beginner → Intermediate (16 looks).',
     bannerClass: 'world-card__banner--css',
     art: '/art/world-css.jpg',
     accent: '#5dff9f',
-    unlockAfterWorld: 'html-village',
-    bossQuestId: 'css-forest-boss',
+    bossQuestId: 'css-i-boss',
   },
   {
     id: 'js-arena',
@@ -43,7 +42,6 @@ export const WORLDS: WorldDef[] = [
     bannerClass: 'world-card__banner--js',
     art: '/art/world-js.jpg',
     accent: '#ffe566',
-    unlockAfterWorld: 'css-forest',
     bossQuestId: 'js-arena-boss',
   },
   {
@@ -54,18 +52,15 @@ export const WORLDS: WorldDef[] = [
     bannerClass: 'world-card__banner--fusion',
     art: '/art/world-fusion.jpg',
     accent: '#d4a5ff',
-    unlockAfterWorld: 'js-arena',
     bossQuestId: 'web-fusion-boss',
   },
 ]
 
 export function isWorldUnlocked(
-  world: WorldDef,
-  completedQuestIds: string[],
-  worlds: WorldDef[] = WORLDS,
+  _world: WorldDef,
+  _completedQuestIds: string[],
+  _worlds: WorldDef[] = WORLDS,
 ): boolean {
-  if (!world.unlockAfterWorld) return true
-  const prev = worlds.find((w) => w.id === world.unlockAfterWorld)
-  if (!prev) return true
-  return completedQuestIds.includes(prev.bossQuestId)
+  // Languages stay open; only chapters/levels lock in order.
+  return true
 }

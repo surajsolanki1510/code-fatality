@@ -577,17 +577,232 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
       break
     }
 
-    case 'css-forest-1': {
+    case 'css-forest-1':
+    case 'css-b01': {
       const sheet = css ?? ''
       checks.push({
         id: 'body-bg',
         passed: /body\s*\{[^}]*background(-color)?\s*:/i.test(sheet),
         message: 'Set background on body { }',
       })
+      break
+    }
+    case 'css-b02': {
+      const sheet = css ?? ''
       checks.push({
-        id: 'h1-color',
-        passed: /h1\s*\{[^}]*color\s*:/i.test(sheet),
-        message: 'Set color on h1 { }',
+        id: 'title-color',
+        passed: /\.title\s*\{[^}]*color\s*:/i.test(sheet),
+        message: 'Set color on .title',
+      })
+      break
+    }
+    case 'css-b03': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'title-size',
+        passed: /\.title\s*\{[^}]*font-size\s*:/i.test(sheet),
+        message: 'Set font-size on .title',
+      })
+      checks.push({
+        id: 'title-weight',
+        passed: /\.title\s*\{[^}]*font-weight\s*:/i.test(sheet),
+        message: 'Set font-weight on .title',
+      })
+      break
+    }
+    case 'css-b04': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'align-center',
+        passed: /\.runway\s*\{[^}]*text-align\s*:\s*center/i.test(sheet),
+        message: 'Center .runway with text-align: center',
+      })
+      checks.push({
+        id: 'tracking',
+        passed: /\.tag\s*\{[^}]*letter-spacing\s*:/i.test(sheet),
+        message: 'Add letter-spacing on .tag',
+      })
+      break
+    }
+    case 'css-b05': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'card-pad',
+        passed: /\.card\s*\{[^}]*padding\s*:/i.test(sheet),
+        message: 'Add padding on .card',
+      })
+      checks.push({
+        id: 'card-border',
+        passed: /\.card\s*\{[^}]*border(-width|-style|-color)?\s*:/i.test(sheet),
+        message: 'Add border on .card',
+      })
+      checks.push({
+        id: 'card-radius',
+        passed: /\.card\s*\{[^}]*border-radius\s*:/i.test(sheet),
+        message: 'Add border-radius on .card',
+      })
+      break
+    }
+    case 'css-b06': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'card-shadow',
+        passed: /\.card\s*\{[^}]*box-shadow\s*:/i.test(sheet),
+        message: 'Add box-shadow on .card',
+      })
+      break
+    }
+    case 'css-b07': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'card-maxw',
+        passed: /\.card\s*\{[^}]*max-width\s*:/i.test(sheet),
+        message: 'Set max-width on .card',
+      })
+      checks.push({
+        id: 'card-center',
+        passed:
+          /\.card\s*\{[^}]*margin\s*:[^;]*auto/i.test(sheet) ||
+          (/\.card\s*\{[^}]*margin-left\s*:\s*auto/i.test(sheet) &&
+            /\.card\s*\{[^}]*margin-right\s*:\s*auto/i.test(sheet)),
+        message: 'Center .card with margin auto',
+      })
+      break
+    }
+    case 'css-b08': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'row-flex',
+        passed: /\.row\s*\{[^}]*display\s*:\s*flex/i.test(sheet),
+        message: 'Set display: flex on .row',
+      })
+      checks.push({
+        id: 'row-gap',
+        passed: /\.row\s*\{[^}]*gap\s*:/i.test(sheet),
+        message: 'Add gap on .row',
+      })
+      break
+    }
+    case 'css-b09': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'row-justify',
+        passed: /\.row\s*\{[^}]*justify-content\s*:\s*(center|space-between|space-around|space-evenly)/i.test(
+          sheet,
+        ),
+        message: 'Set justify-content on .row',
+      })
+      checks.push({
+        id: 'row-align',
+        passed: /\.row\s*\{[^}]*align-items\s*:\s*center/i.test(sheet),
+        message: 'Set align-items: center on .row',
+      })
+      break
+    }
+    case 'css-b-boss': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'body-bg',
+        passed: /body\s*\{[^}]*background(-color)?\s*:/i.test(sheet),
+        message: 'body background',
+      })
+      checks.push({
+        id: 'title-color',
+        passed: /\.title\s*\{[^}]*color\s*:/i.test(sheet),
+        message: '.title color',
+      })
+      checks.push({
+        id: 'card-pad',
+        passed: /\.card\s*\{[^}]*padding\s*:/i.test(sheet),
+        message: '.card padding',
+      })
+      checks.push({
+        id: 'card-radius',
+        passed: /\.card\s*\{[^}]*border-radius\s*:/i.test(sheet),
+        message: '.card border-radius',
+      })
+      checks.push({
+        id: 'row-flex',
+        passed: /\.row\s*\{[^}]*display\s*:\s*flex/i.test(sheet),
+        message: '.row flex',
+      })
+      checks.push({
+        id: 'row-gap',
+        passed: /\.row\s*\{[^}]*gap\s*:/i.test(sheet),
+        message: '.row gap',
+      })
+      break
+    }
+    case 'css-i01': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'row-grid',
+        passed: /\.row\s*\{[^}]*display\s*:\s*grid/i.test(sheet),
+        message: 'Set display: grid on .row',
+      })
+      break
+    }
+    case 'css-i02': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'row-cols',
+        passed:
+          /\.row\s*\{[^}]*grid-template-columns\s*:\s*repeat\s*\(\s*3\s*,/i.test(sheet) ||
+          /\.row\s*\{[^}]*grid-template-columns\s*:[^;]*1fr[^;]*1fr[^;]*1fr/i.test(sheet),
+        message: 'Use 3 columns on .row (repeat(3, 1fr) or three tracks)',
+      })
+      break
+    }
+    case 'css-i03': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'tile-hover',
+        passed: /\.tile\s*:\s*hover\s*\{[^}]*(background|color|transform|border)\s*:/i.test(sheet),
+        message: 'Style .tile:hover with a visible change',
+      })
+      break
+    }
+    case 'css-i04': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'tile-transition',
+        passed: /\.tile\s*\{[^}]*transition\s*:/i.test(sheet),
+        message: 'Add transition on .tile',
+      })
+      break
+    }
+    case 'css-i05': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'body-gradient',
+        passed: /body\s*\{[^}]*(background(-color)?|background)\s*:[^;]*linear-gradient\s*\(/i.test(sheet),
+        message: 'Use linear-gradient on body background',
+      })
+      break
+    }
+    case 'css-i-boss': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'body-gradient',
+        passed: /body\s*\{[^}]*linear-gradient\s*\(/i.test(sheet) || /linear-gradient\s*\(/i.test(sheet),
+        message: 'body gradient',
+      })
+      checks.push({
+        id: 'row-grid',
+        passed: /\.row\s*\{[^}]*display\s*:\s*grid/i.test(sheet),
+        message: '.row grid',
+      })
+      checks.push({
+        id: 'row-cols',
+        passed:
+          /\.row\s*\{[^}]*grid-template-columns\s*:\s*repeat\s*\(\s*3\s*,/i.test(sheet) ||
+          /\.row\s*\{[^}]*grid-template-columns\s*:[^;]*1fr[^;]*1fr[^;]*1fr/i.test(sheet),
+        message: '3-column grid',
+      })
+      checks.push({
+        id: 'tile-hover',
+        passed: /\.tile\s*:\s*hover\s*\{/i.test(sheet),
+        message: '.tile:hover',
       })
       break
     }

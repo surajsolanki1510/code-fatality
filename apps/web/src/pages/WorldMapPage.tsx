@@ -22,7 +22,7 @@ export function WorldMapPage() {
         <div className="map-header">
           <h1 className="arena-title arena-title--section">Pick your path</h1>
           <p className="arena-tagline">
-            Enter a realm to fight, or open its digital notebook and write your own notes.
+            All languages are open. Inside each realm, clear chapters in order.
           </p>
         </div>
         <div className="world-select">

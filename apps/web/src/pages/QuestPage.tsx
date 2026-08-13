@@ -5,6 +5,7 @@ import { LearnPanel } from '../components/LearnPanel'
 import { ArenaButton, QuestNav } from '../components/QuestNav'
 import { FatalityArena, type LockOutcome } from '../components/quest-visuals/FatalityArena'
 import { LiveQuestArena } from '../components/quest-visuals/LiveQuestArena'
+import { StyleForgeArena } from '../components/quest-visuals/StyleForgeArena'
 import { BRAND } from '../config/brand'
 import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests'
 import { buildPreviewDocument, validateQuest } from '../lib/validateQuest'
@@ -160,6 +161,223 @@ export function QuestPage() {
 
   const alreadyDone = isQuestComplete(quest.id)
   const isHtmlVillage = quest.worldId === 'html-village'
+  const isCssForest = quest.worldId === 'css-forest'
+
+  if (isCssForest) {
+    const showHint = () => {
+      const hint = quest.hints[hintIndex]
+      if (hint) {
+        setFeedback({ type: 'fail', text: `Hint: ${hint}` })
+        setHintIndex((i) => Math.min(i + 1, quest.hints.length - 1))
+        setPhoneTab('code')
+      }
+    }
+
+    const onLockLook = () => {
+      runCheck()
+      setPhoneTab('code')
+    }
+
+    const styleCoach =
+      lockOutcome === 'win'
+        ? quest.realWorldWin
+          ? `LOOK LOCKED. ${quest.realWorldWin}`
+          : 'LOOK LOCKED. The runway felt that drip.'
+        : lockOutcome === 'fail'
+          ? 'Vibe rejected — fix the CSS and lock the look again.'
+          : passedCount === 0
+            ? (quest.missionBrief ?? 'Dress the neon runway with CSS.')
+            : passedCount < totalCount
+              ? `Vibe ${passedCount}/${totalCount} — keep styling, then LOCK LOOK.`
+              : 'Full vibe ready. Smash LOCK LOOK.'
+
+    return (
+      <div className={`style-forge-game${phoneTab === 'code' ? ' is-phone-style' : ''}`}>
+        <header className="style-forge-game__nav">
+          <Link to={`/world/${quest.worldId}`}>← Looks</Link>
+          <span className="style-forge-game__brand">{BRAND.short}</span>
+          <Link to={`/notebook/${quest.worldId}`} className="style-forge-game__notebook">
+            Notebook
+          </Link>
+          <span className="style-forge-game__chap">
+            {quest.tier.toUpperCase()} · LOOK {quest.chapter}
+            {quest.kind === 'boss' ? ' · BOSS' : ''}
+          </span>
+        </header>
+
+        <nav className="style-forge-phone-tabs" aria-label="Style sections">
+          <button
+            type="button"
+            className={phoneTab === 'learn' ? 'is-on' : ''}
+            onClick={() => setPhoneTab('learn')}
+          >
+            Lesson
+          </button>
+          <button
+            type="button"
+            className={phoneTab === 'code' ? 'is-on' : ''}
+            onClick={() => setPhoneTab('code')}
+          >
+            Style
+            {passedCount > 0 && (
+              <span className="fatality-phone-tabs__badge">
+                {passedCount}/{totalCount}
+              </span>
+            )}
+          </button>
+        </nav>
+
+        <div className="style-forge-game__split">
+          <aside className={`style-forge-teach${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
+            <div className="style-forge-teach__scroll">
+              <div className="fatality-teach__level">
+                <span className="fatality-teach__level-pill">Look {quest.chapter}</span>
+                {quest.kind === 'boss' && <span>BOSS LOOK</span>}
+              </div>
+              <h1 className="fatality-teach__title">{quest.title}</h1>
+              <p className="fatality-teach__hook">{quest.hook}</p>
+              {quest.missionBrief && (
+                <div className="fatality-mission-brief">
+                  <h2>Style this</h2>
+                  <p>{quest.missionBrief}</p>
+                  {quest.realWorldWin && (
+                    <p className="fatality-mission-brief__real">
+                      <strong>Real world:</strong> {quest.realWorldWin}
+                    </p>
+                  )}
+                </div>
+              )}
+              <div className="fatality-explain">
+                <h2>How the CSS works</h2>
+                <p>{quest.lessonSummary}</p>
+                {quest.tagLessons.map((lesson) => (
+                  <article key={`${quest.id}-${lesson.tag}`} className="fatality-tag-card">
+                    <code>{lesson.tag}</code>
+                    <p>
+                      <strong>What is this?</strong> {lesson.purpose}
+                    </p>
+                    {lesson.why && (
+                      <p>
+                        <strong>Why?</strong> {lesson.why}
+                      </p>
+                    )}
+                    <pre>{lesson.example}</pre>
+                    {lesson.mistake && (
+                      <p className="fatality-tag-card__mistake">
+                        <strong>Don&apos;t do this:</strong> {lesson.mistake}
+                      </p>
+                    )}
+                  </article>
+                ))}
+              </div>
+              <div className="fatality-missions">
+                <h2>Style goals</h2>
+                <ul>
+                  {quest.objectives.map((obj) => {
+                    const done = liveCheck?.results.find((r) => r.id === obj.id)?.passed ?? false
+                    return (
+                      <li key={obj.id} className={done ? 'is-done' : ''}>
+                        <span className="fatality-missions__icon">{done ? '✓' : ''}</span>
+                        {obj.label}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+              <button type="button" className="style-forge-phone-cta" onClick={() => setPhoneTab('code')}>
+                Enter the runway →
+              </button>
+            </div>
+          </aside>
+
+          <section className={`style-forge-play${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+            <StyleForgeArena
+              quest={quest}
+              css={css}
+              previewSrcDoc={previewSrcDoc}
+              checkResults={liveCheck?.results}
+              coachLine={styleCoach}
+              lockedLook={lockOutcome === 'win'}
+            />
+          </section>
+
+          <div className={`style-forge-editor${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+            <div className="style-forge-editor__bar style-forge-editor__bar--desktop">
+              <span className="style-forge-editor__label">Your CSS</span>
+              <button type="button" className="style-forge-editor__btn style-forge-editor__btn--ghost" onClick={showHint}>
+                Hint
+              </button>
+              <button type="button" className="style-forge-editor__btn style-forge-editor__btn--check" onClick={runCheck}>
+                LOCK LOOK
+              </button>
+              {feedback?.type === 'win' && nextQuest && (
+                <button
+                  type="button"
+                  className="style-forge-editor__btn style-forge-editor__btn--next"
+                  onClick={() => navigate(`/quest/${nextQuest.id}`)}
+                >
+                  Next →
+                </button>
+              )}
+            </div>
+            <div className="style-forge-editor__monaco">
+              {isPhone ? (
+                <textarea
+                  className="fatality-editor__textarea"
+                  value={css}
+                  onChange={(e) => {
+                    setCss(e.target.value)
+                    if (lockOutcome === 'win') return
+                    setLockOutcome('idle')
+                  }}
+                  spellCheck={false}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                />
+              ) : (
+                <Editor
+                  height="100%"
+                  language="css"
+                  theme="vs-dark"
+                  value={css}
+                  onChange={(v) => {
+                    setCss(v ?? '')
+                    if (lockOutcome === 'win') return
+                    setLockOutcome('idle')
+                  }}
+                  options={editorOptions}
+                />
+              )}
+            </div>
+            {feedback && (
+              <p className={`style-forge-toast style-forge-toast--${feedback.type}`}>
+                {showVictory && !alreadyDone && <strong>LOOK LOCKED · </strong>}
+                {feedback.text}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="style-forge-phone-actions">
+          <button type="button" className="style-forge-editor__btn style-forge-editor__btn--ghost" onClick={showHint}>
+            Hint
+          </button>
+          <button type="button" className="style-forge-editor__btn style-forge-editor__btn--check" onClick={onLockLook}>
+            LOCK LOOK
+          </button>
+          {feedback?.type === 'win' && nextQuest && (
+            <button
+              type="button"
+              className="style-forge-editor__btn style-forge-editor__btn--next"
+              onClick={() => navigate(`/quest/${nextQuest.id}`)}
+            >
+              Next →
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   if (isHtmlVillage) {
     const showHint = () => {

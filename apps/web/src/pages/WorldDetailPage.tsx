@@ -13,7 +13,7 @@ import { TIER_LABEL, type QuestDef, type SkillTier } from '../data/quests/types'
 import { WORLDS } from '../data/worlds'
 import { useProgressStore } from '../store/progressStore'
 
-const TIERS: SkillTier[] = ['beginner', 'intermediate', 'expert']
+const ALL_TIERS: SkillTier[] = ['beginner', 'intermediate', 'expert']
 
 export function WorldDetailPage() {
   const { worldId } = useParams<{ worldId: string }>()
@@ -23,7 +23,9 @@ export function WorldDetailPage() {
 
   const world = WORLDS.find((w) => w.id === worldId)
   const progress = worldId ? getChapterProgress(worldId, completed) : null
-  const showTiers = worldId === 'html-village'
+  const showTiers = worldId === 'html-village' || worldId === 'css-forest'
+  const tiers: SkillTier[] =
+    worldId === 'css-forest' ? ['beginner', 'intermediate'] : ALL_TIERS
 
   if (!world || !worldId) {
     return (
@@ -65,7 +67,7 @@ export function WorldDetailPage() {
       </div>
 
       {showTiers
-        ? TIERS.map((tier) => {
+        ? tiers.map((tier) => {
             const unlocked = isTierUnlocked(world.id, tier, completed)
             const tierProg = getTierProgress(world.id, tier, completed)
             const quests = getQuestsByTier(world.id, tier)

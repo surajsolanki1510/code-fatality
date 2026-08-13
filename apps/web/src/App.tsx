@@ -12,6 +12,7 @@ import { checkDesktopUpdate } from './utils/desktopUpdater'
 import './styles/arena.css'
 import './styles/learn.css'
 import './styles/fatality.css'
+import './styles/styleForge.css'
 import './styles/auth.css'
 import './styles/downloads.css'
 
