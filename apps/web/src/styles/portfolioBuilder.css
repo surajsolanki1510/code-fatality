@@ -75,8 +75,8 @@ body:has(.pf-game),
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(220px, 26%) 1fr;
-  grid-template-rows: minmax(0, 1fr) minmax(150px, 30%);
+  grid-template-columns: minmax(200px, 24%) 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(180px, 34%);
   overflow: hidden;
 }
 
@@ -213,7 +213,7 @@ body:has(.pf-game),
   grid-row: 1;
   min-height: 0;
   overflow: hidden;
-  padding: 0.4rem 0.5rem 0.2rem;
+  padding: 0;
 }
 
 .pf-code {
@@ -337,250 +337,64 @@ body:has(.pf-game),
   display: none;
 }
 
-/* Arena */
-.pf-build {
+/* The site itself — HTML + CSS from the editor, not a fake preview window */
+.pf-site {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.35rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid var(--pf-line);
-  box-shadow: 0 8px 32px rgba(26, 18, 24, 0.06);
+  background: #fff;
 }
 
-.pf-build.is-live {
-  border-color: rgba(232, 93, 138, 0.35);
-  box-shadow: 0 0 0 3px rgba(232, 93, 138, 0.12), 0 12px 40px rgba(232, 93, 138, 0.15);
-}
-
-.pf-build__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.pf-build__kicker {
-  margin: 0;
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--pf-accent);
-  font-weight: 800;
-}
-
-.pf-build__top h2 {
-  margin: 0.1rem 0 0;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 400;
-}
-
-.pf-build__pct {
-  text-align: center;
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
-  background: var(--pf-card);
-  border: 1px solid var(--pf-line);
-}
-
-.pf-build__pct strong {
-  display: block;
-  font-size: 1rem;
-  color: var(--pf-accent2);
-}
-
-.pf-build__pct span {
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--pf-muted);
-}
-
-.pf-build__profile {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.35rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px dashed rgba(232, 93, 138, 0.35);
-}
-
-.pf-build__photo {
+.pf-site__tools {
   flex-shrink: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
+  gap: 0.65rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--pf-line);
 }
 
-.pf-build__photo img {
-  width: 52px;
-  height: 52px;
+.pf-site__photo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px dashed rgba(232, 93, 138, 0.5);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.15rem 0.7rem 0.15rem 0.15rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pf-site__photo img {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--pf-accent);
-  background: #f0e8f2;
 }
 
-.pf-build__photo span {
-  font-size: 0.58rem;
-  font-weight: 700;
+.pf-site__photo span {
+  font-size: 0.68rem;
+  font-weight: 800;
   color: var(--pf-accent);
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
-.pf-build__fields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.pf-build__fields label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.pf-site__tools p {
+  margin: 0;
+  font-size: 0.72rem;
   color: var(--pf-muted);
+  line-height: 1.3;
 }
 
-.pf-build__fields input {
-  border: 1px solid var(--pf-line);
-  border-radius: 6px;
-  padding: 0.3rem 0.45rem;
-  font-family: inherit;
-  font-size: 0.82rem;
-  background: #fff;
-  color: var(--pf-ink);
-}
-
-.pf-build__sections {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.pf-build__sections span {
-  flex: 1;
-  min-width: 0;
-  text-align: center;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 0.2rem;
-  border-radius: 6px;
-  background: rgba(26, 18, 24, 0.04);
-  color: var(--pf-muted);
-  opacity: 0.45;
-}
-
-.pf-build__sections span.is-on {
-  opacity: 1;
-  background: rgba(91, 77, 255, 0.12);
-  color: var(--pf-accent2);
-}
-
-.pf-build__device {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid #1a1218;
-  box-shadow: 0 16px 48px rgba(26, 18, 24, 0.15);
-}
-
-.pf-build__device-bar {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.35rem 0.55rem;
-  background: #1a1218;
-}
-
-.pf-build__device-bar span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ff8fb5;
-}
-
-.pf-build__device-bar span:nth-child(2) {
-  background: #f0c89a;
-}
-.pf-build__device-bar span:nth-child(3) {
-  background: #7dffc8;
-}
-
-.pf-build__device-bar strong {
-  margin-left: 0.35rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  color: #fff;
-}
-
-.pf-build__iframe {
+.pf-site__page {
   flex: 1;
   width: 100%;
   min-height: 0;
   border: none;
   background: #fff;
-}
-
-.pf-build__live-badge {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 0.5rem 1.2rem;
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--pf-accent);
-  border: 3px solid var(--pf-accent);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.95);
-  pointer-events: none;
-}
-
-.pf-build__checks {
-  display: none;
-}
-
-.pf-build__coach {
-  display: flex;
-  gap: 0.45rem;
-  align-items: center;
-  padding: 0.2rem;
-}
-
-.pf-build__face {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, var(--pf-accent), var(--pf-accent2));
-}
-
-.pf-build__coach p {
-  margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.3;
-  color: var(--pf-muted);
 }
 
 @media (max-width: 960px) {
@@ -660,5 +474,17 @@ body:has(.pf-game),
     font-family: inherit;
     font-weight: 800;
     cursor: pointer;
+  }
+
+  .pf-game.is-phone-build .pf-game__split {
+    grid-template-rows: minmax(0, 1fr) minmax(180px, 42%);
+  }
+
+  .pf-game.is-phone-build .pf-stage.is-phone-on {
+    grid-row: 1;
+  }
+
+  .pf-game.is-phone-build .pf-code.is-phone-on {
+    grid-row: 2;
   }
 }

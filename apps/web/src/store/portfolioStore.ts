@@ -6,6 +6,8 @@ export type PortfolioProfile = {
   tagline: string
   about: string
   photoDataUrl: string | null
+  siteHtml: string
+  siteCss: string
 }
 
 export const DEFAULT_AVATAR =
@@ -19,6 +21,8 @@ const DEFAULT: PortfolioProfile = {
   tagline: 'Future developer · CSS learner',
   about: 'I build beautiful things on the web. This portfolio is proof.',
   photoDataUrl: null,
+  siteHtml: '',
+  siteCss: '',
 }
 
 type PortfolioState = PortfolioProfile & {
@@ -26,6 +30,7 @@ type PortfolioState = PortfolioProfile & {
   setTagline: (tagline: string) => void
   setAbout: (about: string) => void
   setPhoto: (dataUrl: string | null) => void
+  saveSite: (html: string, css: string) => void
 }
 
 export const usePortfolioStore = create<PortfolioState>()(
@@ -36,6 +41,7 @@ export const usePortfolioStore = create<PortfolioState>()(
       setTagline: (tagline) => set({ tagline: tagline.trim() || DEFAULT.tagline }),
       setAbout: (about) => set({ about: about.trim() || DEFAULT.about }),
       setPhoto: (photoDataUrl) => set({ photoDataUrl }),
+      saveSite: (siteHtml, siteCss) => set({ siteHtml, siteCss }),
     }),
     { name: 'code-fatality-portfolio' },
   ),

@@ -1,7 +1,7 @@
 /** Portfolio HTML grows each chapter — user styles it with CSS. */
 
-export const P_EMPTY = `<!-- Your portfolio starts here -->
-<p>My portfolio</p>`
+export const P_EMPTY = `<!-- This HTML file IS your portfolio website. Build it here. -->
+`
 
 export const P_SHELL = `<div class="portfolio">
   <header class="hero">
@@ -120,4 +120,60 @@ export function sectionsUnlocked(chapter: number): string[] {
   if (chapter >= 7) return ['Hero', 'About']
   if (chapter >= 2) return ['Hero']
   return ['Shell']
+}
+
+function hasClass(html: string, className: string) {
+  return new RegExp(`class=["'][^"']*\\b${className}\\b`, 'i').test(html)
+}
+
+function extractBlock(html: string, tag: string, className: string): string | null {
+  const re = new RegExp(
+    `<${tag}\\b[^>]*class=["'][^"']*\\b${className}\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/${tag}>`,
+    'i',
+  )
+  return html.match(re)?.[0] ?? null
+}
+
+function insertBeforePortfolioClose(html: string, snippet: string): string {
+  const close = html.lastIndexOf('</div>')
+  if (close === -1) return `${html.trim()}\n${snippet}\n`
+  return `${html.slice(0, close)}  ${snippet}\n${html.slice(close)}`
+}
+
+function isBlankPortfolio(html: string) {
+  const stripped = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<p>\s*My portfolio\s*<\/p>/gi, '').trim()
+  return stripped.length === 0
+}
+
+/** Keep the player's own HTML/CSS. Only add new sections the next level needs to style. */
+export function continuePortfolioFiles(
+  savedHtml: string,
+  savedCss: string,
+  starterHtml: string,
+  starterCss: string,
+): { html: string; css: string } {
+  const html = !isBlankPortfolio(savedHtml) ? mergeMissingSections(savedHtml, starterHtml) : starterHtml
+  const cssBody = savedCss.replace(/\/\*[\s\S]*?\*\//g, '').trim()
+  const css = cssBody.length > 0 ? savedCss : starterCss
+  return { html, css }
+}
+
+function mergeMissingSections(userHtml: string, starterHtml: string): string {
+  let out = userHtml
+  for (const name of ['about', 'skills', 'projects'] as const) {
+    if (hasClass(out, name)) continue
+    const snippet = extractBlock(starterHtml, 'section', name)
+    if (snippet) out = insertBeforePortfolioClose(out, snippet)
+  }
+  if (!hasClass(out, 'contact')) {
+    const footer = extractBlock(starterHtml, 'footer', 'contact')
+    if (footer) out = insertBeforePortfolioClose(out, footer)
+  }
+  if (hasClass(starterHtml, 'avatar') && !hasClass(out, 'avatar') && hasClass(out, 'hero')) {
+    out = out.replace(
+      /(<header\b[^>]*class=["'][^"']*\bhero\b[^>]*>)/i,
+      `$1\n    <img class="avatar" src="{{PHOTO}}" alt="Profile photo" />`,
+    )
+  }
+  return out
 }

@@ -6,6 +6,7 @@ import { ArenaButton, QuestNav } from '../components/QuestNav'
 import { FatalityArena, type LockOutcome } from '../components/quest-visuals/FatalityArena'
 import { LiveQuestArena } from '../components/quest-visuals/LiveQuestArena'
 import { PortfolioBuilderArena } from '../components/quest-visuals/PortfolioBuilderArena'
+import { continuePortfolioFiles } from '../data/quests/portfolioHtml'
 import { injectPortfolioHtml, usePortfolioStore } from '../store/portfolioStore'
 import { BRAND } from '../config/brand'
 import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests'
@@ -32,6 +33,9 @@ export function QuestPage() {
   const [isPhone, setIsPhone] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 960px)').matches : false,
   )
+  const [hydrated, setHydrated] = useState(() =>
+    typeof window === 'undefined' ? false : usePortfolioStore.persist.hasHydrated(),
+  )
   const deferredHtml = useDeferredValue(html)
   const deferredCss = useDeferredValue(css)
 
@@ -45,21 +49,53 @@ export function QuestPage() {
   }, [])
 
   useEffect(() => {
+    const finish = () => setHydrated(true)
+    if (usePortfolioStore.persist.hasHydrated()) finish()
+    return usePortfolioStore.persist.onFinishHydration(finish)
+  }, [])
+
+  useEffect(() => {
     if (!quest) return
-    setHtml(quest.starterHtml)
-    setCss(quest.starterCss ?? '')
+    if (quest.worldId === 'css-forest') {
+      if (!hydrated) return
+      const { siteHtml, siteCss } = usePortfolioStore.getState()
+      const next = continuePortfolioFiles(
+        siteHtml ?? '',
+        siteCss ?? '',
+        quest.starterHtml,
+        quest.starterCss ?? '',
+      )
+      setHtml(next.html)
+      setCss(next.css)
+    } else {
+      setHtml(quest.starterHtml)
+      setCss(quest.starterCss ?? '')
+    }
     setFeedback(null)
     setHintIndex(0)
     setFailIndex(0)
     setShowVictory(false)
     setLockOutcome('idle')
     setPhoneTab('learn')
-    setCodeLang('html')
-  }, [quest])
+    setCodeLang(quest.worldId === 'css-forest' && quest.chapter > 1 ? 'css' : 'html')
+  }, [quest, hydrated])
 
-  const portfolioProfile = usePortfolioStore()
+  const name = usePortfolioStore((s) => s.name)
+  const tagline = usePortfolioStore((s) => s.tagline)
+  const about = usePortfolioStore((s) => s.about)
+  const photoDataUrl = usePortfolioStore((s) => s.photoDataUrl)
+  const portfolioProfile = useMemo(
+    () => ({ name, tagline, about, photoDataUrl, siteHtml: '', siteCss: '' }),
+    [name, tagline, about, photoDataUrl],
+  )
 
   const isCssForest = quest?.worldId === 'css-forest'
+
+  useEffect(() => {
+    if (!isCssForest || !hydrated) return
+    if (!html.trim() && !css.trim()) return
+    usePortfolioStore.getState().saveSite(html, css)
+  }, [html, css, isCssForest, hydrated])
 
   const portfolioHtml = useMemo(() => {
     if (!isCssForest) return deferredHtml
@@ -200,17 +236,6 @@ export function QuestPage() {
     }
 
     const packLabel = quest.story[0]?.replace('Portfolio section: ', '') ?? 'CSS'
-    const coachLine =
-      lockOutcome === 'win'
-        ? 'Section saved to your portfolio. It\'s looking hire-ready.'
-        : lockOutcome === 'fail'
-          ? 'Tick the checklist — one CSS idea at a time.'
-          : passedCount === 0
-            ? `This level teaches ${packLabel}. Style it on YOUR portfolio.`
-            : passedCount < totalCount
-              ? `${passedCount}/${totalCount} done — keep building.`
-              : 'Ready! Hit PUBLISH SECTION.'
-
     const lesson = quest.tagLessons[0]
 
     return (
@@ -229,7 +254,7 @@ export function QuestPage() {
             Learn
           </button>
           <button type="button" className={phoneTab === 'code' ? 'is-on' : ''} onClick={() => setPhoneTab('code')}>
-            Build
+            Code
             {passedCount > 0 && (
               <span className="fatality-phone-tabs__badge">
                 {passedCount}/{totalCount}
@@ -246,7 +271,7 @@ export function QuestPage() {
               <p className="pf-lesson__hook">{quest.hook}</p>
 
               <div className="pf-lesson__job">
-                <h2>Add to your portfolio</h2>
+                <h2>Write this in your site</h2>
                 <p>{quest.missionBrief}</p>
               </div>
 
@@ -279,19 +304,13 @@ export function QuestPage() {
               </ul>
 
               <button type="button" className="pf-lesson__cta" onClick={() => setPhoneTab('code')}>
-                Open portfolio builder →
+                Code your portfolio →
               </button>
             </div>
           </aside>
 
           <section className={`pf-stage${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <PortfolioBuilderArena
-              quest={quest}
-              previewSrcDoc={previewSrcDoc}
-              checkResults={liveCheck?.results}
-              coachLine={coachLine}
-              published={lockOutcome === 'win'}
-            />
+            <PortfolioBuilderArena previewSrcDoc={previewSrcDoc} />
           </section>
 
           <div className={`pf-code${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
@@ -315,8 +334,8 @@ export function QuestPage() {
             </div>
             <p className="pf-code__hint">
               {codeLang === 'html'
-                ? 'HTML = portfolio structure. Use {{NAME}} {{PHOTO}} {{TAGLINE}} {{ABOUT}} placeholders.'
-                : `CSS = ${packLabel} styling. All rules for this pack go here.`}
+                ? 'This HTML is your portfolio page. Type your name, photo (src="{{PHOTO}}"), and sections here.'
+                : 'This CSS is your stylesheet. Every rule you write styles the page above — it stays for every level.'}
             </p>
             <div className="pf-code__editor">
               {isPhone ? (
@@ -346,7 +365,7 @@ export function QuestPage() {
               )}
             </div>
             <div className="pf-code__bar pf-code__bar--desktop">
-              <span>Your portfolio code</span>
+              <span>index.html / styles.css</span>
               <button type="button" className="pf-code__btn pf-code__btn--ghost" onClick={showHint}>
                 Hint
               </button>
