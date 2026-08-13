@@ -27,6 +27,7 @@ export function QuestPage() {
   const [showVictory, setShowVictory] = useState(false)
   const [lockOutcome, setLockOutcome] = useState<LockOutcome>('idle')
   const [phoneTab, setPhoneTab] = useState<'learn' | 'code'>('learn')
+  const [codeLang, setCodeLang] = useState<'html' | 'css'>('html')
   const [isPhone, setIsPhone] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 960px)').matches : false,
   )
@@ -52,6 +53,7 @@ export function QuestPage() {
     setShowVictory(false)
     setLockOutcome('idle')
     setPhoneTab('learn')
+    setCodeLang('html')
   }, [quest])
 
   const isCssForest = quest?.worldId === 'css-forest'
@@ -196,16 +198,16 @@ export function QuestPage() {
 
     const glowCoach =
       lockOutcome === 'win'
-        ? quest.realWorldWin
-          ? `POSTED. ${quest.realWorldWin}`
-          : 'POSTED. That glow is immaculate.'
+        ? 'ICONIC. You just made that page look expensive.'
         : lockOutcome === 'fail'
-          ? 'Not quite aesthetic — fix HTML structure or CSS polish and post again.'
+          ? 'Almost — tick the checklist one by one. No stress.'
           : passedCount === 0
-            ? (quest.missionBrief ?? 'Beautify the dump — edit HTML and CSS together.')
+            ? 'Start with HTML structure, then add CSS color. You’ve got this.'
             : passedCount < totalCount
-              ? `Glow ${passedCount}/${totalCount} — keep building, then POST GLOW UP.`
-              : 'Full glow ready. Hit POST GLOW UP.'
+              ? `Nice — ${passedCount}/${totalCount} done. Keep going.`
+              : 'All goals lit. Hit POST GLOW UP.'
+
+    const lesson = quest.tagLessons[0]
 
     return (
       <div className={`glow-up-game${phoneTab === 'code' ? ' is-phone-glow' : ''}`}>
@@ -216,7 +218,7 @@ export function QuestPage() {
             Notebook
           </Link>
           <span className="glow-up-game__chap">
-            {quest.tier.toUpperCase()} · GLOW {quest.chapter}
+            GLOW {quest.chapter}
             {quest.kind === 'boss' ? ' · BOSS' : ''}
           </span>
         </header>
@@ -227,14 +229,14 @@ export function QuestPage() {
             className={phoneTab === 'learn' ? 'is-on' : ''}
             onClick={() => setPhoneTab('learn')}
           >
-            Lesson
+            Learn
           </button>
           <button
             type="button"
             className={phoneTab === 'code' ? 'is-on' : ''}
             onClick={() => setPhoneTab('code')}
           >
-            Build
+            Makeover
             {passedCount > 0 && (
               <span className="fatality-phone-tabs__badge">
                 {passedCount}/{totalCount}
@@ -246,62 +248,52 @@ export function QuestPage() {
         <div className="glow-up-game__split">
           <aside className={`glow-up-teach${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
             <div className="glow-up-teach__scroll">
-              <div className="fatality-teach__level">
-                <span className="fatality-teach__level-pill">Glow {quest.chapter}</span>
-                {quest.kind === 'boss' && <span>BOSS GLOW</span>}
+              <span className="glow-up-easy__pill">
+                {quest.tier} · level {quest.chapter}
+              </span>
+              <h1 className="glow-up-easy__title">{quest.title}</h1>
+              <p className="glow-up-easy__hook">{quest.hook}</p>
+
+              <div className="glow-up-easy__card">
+                <h2>Your job</h2>
+                <p>{quest.missionBrief ?? quest.lessonSummary}</p>
               </div>
-              <h1 className="fatality-teach__title">{quest.title}</h1>
-              <p className="fatality-teach__hook">{quest.hook}</p>
-              {quest.missionBrief && (
-                <div className="fatality-mission-brief">
-                  <h2>Beautify this</h2>
-                  <p>{quest.missionBrief}</p>
-                  {quest.realWorldWin && (
-                    <p className="fatality-mission-brief__real">
-                      <strong>Real world:</strong> {quest.realWorldWin}
-                    </p>
-                  )}
+
+              {lesson && (
+                <div className="glow-up-easy__learn">
+                  <h2>In plain English</h2>
+                  <code>{lesson.tag}</code>
+                  <p>{lesson.purpose}</p>
+                  <pre>{lesson.example}</pre>
                 </div>
               )}
-              <div className="fatality-explain">
-                <h2>How HTML + CSS work together</h2>
-                <p>{quest.lessonSummary}</p>
-                {quest.tagLessons.map((lesson) => (
-                  <article key={`${quest.id}-${lesson.tag}`} className="fatality-tag-card">
-                    <code>{lesson.tag}</code>
-                    <p>
-                      <strong>What is this?</strong> {lesson.purpose}
-                    </p>
-                    {lesson.why && (
-                      <p>
-                        <strong>Why?</strong> {lesson.why}
-                      </p>
-                    )}
-                    <pre>{lesson.example}</pre>
-                    {lesson.mistake && (
-                      <p className="fatality-tag-card__mistake">
-                        <strong>Don&apos;t do this:</strong> {lesson.mistake}
-                      </p>
-                    )}
-                  </article>
-                ))}
-              </div>
-              <div className="fatality-missions">
-                <h2>Glow goals</h2>
-                <ul>
+
+              {quest.tagLessons[1] && (
+                <div className="glow-up-easy__learn">
+                  <h2>Also this</h2>
+                  <code>{quest.tagLessons[1].tag}</code>
+                  <p>{quest.tagLessons[1].purpose}</p>
+                  <pre>{quest.tagLessons[1].example}</pre>
+                </div>
+              )}
+
+              <div className="glow-up-easy__card">
+                <h2>Checklist</h2>
+                <ul className="glow-up-easy__goals">
                   {quest.objectives.map((obj) => {
                     const done = liveCheck?.results.find((r) => r.id === obj.id)?.passed ?? false
                     return (
                       <li key={obj.id} className={done ? 'is-done' : ''}>
-                        <span className="fatality-missions__icon">{done ? '✓' : ''}</span>
+                        <span>{done ? '✓' : '○'}</span>
                         {obj.label}
                       </li>
                     )
                   })}
                 </ul>
               </div>
+
               <button type="button" className="glow-up-phone-cta" onClick={() => setPhoneTab('code')}>
-                Open the studio →
+                Start makeover →
               </button>
             </div>
           </aside>
@@ -318,70 +310,64 @@ export function QuestPage() {
           </section>
 
           <div className={`glow-up-editor${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <div className="glow-up-editor__dual">
-              <div className="glow-up-editor__pane">
-                <div className="glow-up-editor__pane-head glow-up-editor__pane-head--html">HTML</div>
-                <div className="glow-up-editor__monaco">
-                  {isPhone ? (
-                    <textarea
-                      className="fatality-editor__textarea"
-                      value={html}
-                      onChange={(e) => {
-                        setHtml(e.target.value)
-                        onCodeChange()
-                      }}
-                      spellCheck={false}
-                      autoCapitalize="off"
-                      autoCorrect="off"
-                    />
-                  ) : (
-                    <Editor
-                      height="100%"
-                      language="html"
-                      theme="vs-dark"
-                      value={html}
-                      onChange={(v) => {
-                        setHtml(v ?? '')
-                        onCodeChange()
-                      }}
-                      options={editorOptions}
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="glow-up-editor__pane">
-                <div className="glow-up-editor__pane-head glow-up-editor__pane-head--css">CSS</div>
-                <div className="glow-up-editor__monaco">
-                  {isPhone ? (
-                    <textarea
-                      className="fatality-editor__textarea"
-                      value={css}
-                      onChange={(e) => {
-                        setCss(e.target.value)
-                        onCodeChange()
-                      }}
-                      spellCheck={false}
-                      autoCapitalize="off"
-                      autoCorrect="off"
-                    />
-                  ) : (
-                    <Editor
-                      height="100%"
-                      language="css"
-                      theme="vs-dark"
-                      value={css}
-                      onChange={(v) => {
-                        setCss(v ?? '')
-                        onCodeChange()
-                      }}
-                      options={editorOptions}
-                    />
-                  )}
-                </div>
-              </div>
+            <div className="glow-up-editor__tabs" role="tablist" aria-label="Code language">
+              <button
+                type="button"
+                role="tab"
+                data-lang="html"
+                className={codeLang === 'html' ? 'is-on' : ''}
+                aria-selected={codeLang === 'html'}
+                onClick={() => setCodeLang('html')}
+              >
+                HTML
+              </button>
+              <button
+                type="button"
+                role="tab"
+                data-lang="css"
+                className={codeLang === 'css' ? 'is-on' : ''}
+                aria-selected={codeLang === 'css'}
+                onClick={() => setCodeLang('css')}
+              >
+                CSS
+              </button>
+            </div>
+            <p className="glow-up-editor__hint-line">
+              {codeLang === 'html'
+                ? 'HTML = the structure (boxes & text). Switch to CSS for colors & layout.'
+                : 'CSS = the glow (colors, space, motion). Switch to HTML if you need more boxes.'}
+            </p>
+            <div className="glow-up-editor__monaco">
+              {isPhone ? (
+                <textarea
+                  className="fatality-editor__textarea"
+                  value={codeLang === 'html' ? html : css}
+                  onChange={(e) => {
+                    if (codeLang === 'html') setHtml(e.target.value)
+                    else setCss(e.target.value)
+                    onCodeChange()
+                  }}
+                  spellCheck={false}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                />
+              ) : (
+                <Editor
+                  height="100%"
+                  language={codeLang}
+                  theme="vs-dark"
+                  value={codeLang === 'html' ? html : css}
+                  onChange={(v) => {
+                    if (codeLang === 'html') setHtml(v ?? '')
+                    else setCss(v ?? '')
+                    onCodeChange()
+                  }}
+                  options={editorOptions}
+                />
+              )}
             </div>
             <div className="glow-up-editor__bar glow-up-editor__bar--desktop">
-              <span className="glow-up-editor__label">HTML + CSS · live preview above</span>
+              <span className="glow-up-editor__label">One thing at a time</span>
               <button type="button" className="glow-up-editor__btn glow-up-editor__btn--ghost" onClick={showHint}>
                 Hint
               </button>
@@ -400,7 +386,7 @@ export function QuestPage() {
             </div>
             {feedback && (
               <p className={`glow-up-toast glow-up-toast--${feedback.type}`}>
-                {showVictory && !alreadyDone && <strong>POSTED · </strong>}
+                {showVictory && !alreadyDone && <strong>ICONIC · </strong>}
                 {feedback.text}
               </p>
             )}

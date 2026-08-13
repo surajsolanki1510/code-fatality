@@ -2,6 +2,7 @@ import { HTML_BEGINNER } from './htmlBeginner'
 import { HTML_INTERMEDIATE } from './htmlIntermediate'
 import { HTML_EXPERT } from './htmlExpert'
 import { CSS_BEGINNER, CSS_INTERMEDIATE, CSS_EXPERT } from './cssBeginner'
+import { makeCssEasy } from './cssEasyTalk'
 import { storyBeatsFor } from './htmlStoryBeats'
 import { enrichTagLessons } from './tagGuide'
 import type { QuestDef, SkillTier } from './types'
@@ -20,10 +21,9 @@ export const HTML_VILLAGE_QUESTS: QuestDef[] = withStoryBeats([
   ...HTML_EXPERT,
 ])
 
-export const CSS_FOREST_QUESTS: QuestDef[] = [...CSS_BEGINNER, ...CSS_INTERMEDIATE, ...CSS_EXPERT].map((q) => ({
-  ...q,
-  tagLessons: enrichTagLessons(q.tagLessons),
-}))
+export const CSS_FOREST_QUESTS: QuestDef[] = [...CSS_BEGINNER, ...CSS_INTERMEDIATE, ...CSS_EXPERT].map((q) =>
+  makeCssEasy(q),
+)
 
 export const ALL_QUESTS: QuestDef[] = [...HTML_VILLAGE_QUESTS, ...CSS_FOREST_QUESTS]
 
