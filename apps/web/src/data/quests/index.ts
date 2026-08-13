@@ -1,8 +1,7 @@
 import { HTML_BEGINNER } from './htmlBeginner'
 import { HTML_INTERMEDIATE } from './htmlIntermediate'
 import { HTML_EXPERT } from './htmlExpert'
-import { CSS_BEGINNER, CSS_INTERMEDIATE, CSS_EXPERT } from './cssBeginner'
-import { makeCssEasy } from './cssEasyTalk'
+import { CSS_PORTFOLIO_QUESTS } from './cssPortfolio'
 import { storyBeatsFor } from './htmlStoryBeats'
 import { enrichTagLessons } from './tagGuide'
 import type { QuestDef, SkillTier } from './types'
@@ -21,9 +20,7 @@ export const HTML_VILLAGE_QUESTS: QuestDef[] = withStoryBeats([
   ...HTML_EXPERT,
 ])
 
-export const CSS_FOREST_QUESTS: QuestDef[] = [...CSS_BEGINNER, ...CSS_INTERMEDIATE, ...CSS_EXPERT].map((q) =>
-  makeCssEasy(q),
-)
+export const CSS_FOREST_QUESTS: QuestDef[] = CSS_PORTFOLIO_QUESTS
 
 export const ALL_QUESTS: QuestDef[] = [...HTML_VILLAGE_QUESTS, ...CSS_FOREST_QUESTS]
 
@@ -67,8 +64,8 @@ export function isQuestUnlocked(quest: QuestDef, completedIds: string[]): boolea
 export function isTierUnlocked(worldId: string, tier: SkillTier, completedIds: string[]): boolean {
   if (tier === 'beginner') return true
   if (worldId === 'css-forest') {
-    if (tier === 'intermediate') return completedIds.includes('css-b-boss')
-    if (tier === 'expert') return completedIds.includes('css-i-boss')
+    if (tier === 'intermediate') return completedIds.includes('css-p-boss')
+    if (tier === 'expert') return completedIds.includes('css-p-i-boss')
     return false
   }
   if (tier === 'intermediate') {

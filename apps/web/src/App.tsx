@@ -12,7 +12,7 @@ import { checkDesktopUpdate } from './utils/desktopUpdater'
 import './styles/arena.css'
 import './styles/learn.css'
 import './styles/fatality.css'
-import './styles/glowUp.css'
+import './styles/portfolioBuilder.css'
 import './styles/auth.css'
 import './styles/downloads.css'
 

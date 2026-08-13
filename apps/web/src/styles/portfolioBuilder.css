@@ -1,0 +1,664 @@
+/* PORTFOLIO FORGE — build YOUR site level by level */
+
+.pf-game {
+  --pf-bg: #f4f0eb;
+  --pf-ink: #1a1218;
+  --pf-muted: #6b5d65;
+  --pf-accent: #e85d8a;
+  --pf-accent2: #5b4dff;
+  --pf-card: #fff;
+  --pf-line: rgba(26, 18, 24, 0.08);
+  --font-pf: 'Rajdhani', system-ui, sans-serif;
+  --font-display: 'Black Ops One', Impact, sans-serif;
+
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  background: linear-gradient(145deg, #faf7f4 0%, #f0e8f2 45%, #e8eef8 100%);
+  color: var(--pf-ink);
+  font-family: var(--font-pf);
+}
+
+html:has(.pf-game),
+body:has(.pf-game),
+#root:has(.pf-game) {
+  overflow: hidden !important;
+  height: 100%;
+}
+
+.pf-game__nav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  background: rgba(255, 255, 255, 0.75);
+  border-bottom: 1px solid var(--pf-line);
+  backdrop-filter: blur(10px);
+}
+
+.pf-game__nav a {
+  color: var(--pf-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.pf-game__brand {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  background: linear-gradient(90deg, var(--pf-accent), var(--pf-accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pf-game__chap {
+  margin-left: auto;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pf-muted);
+  font-weight: 700;
+}
+
+.pf-phone-tabs {
+  display: none;
+}
+
+.pf-game__split {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 26%) 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(150px, 30%);
+  overflow: hidden;
+}
+
+/* Lesson — light & calm */
+.pf-lesson {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.55);
+  border-right: 1px solid var(--pf-line);
+}
+
+.pf-lesson__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.pf-lesson__pack {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(232, 93, 138, 0.15), rgba(91, 77, 255, 0.12));
+  color: var(--pf-accent);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.pf-lesson__title {
+  margin: 0.5rem 0 0.2rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.pf-lesson__hook {
+  margin: 0 0 0.85rem;
+  color: var(--pf-muted);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.pf-lesson__job {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: var(--pf-card);
+  border: 1px solid var(--pf-line);
+  box-shadow: 0 4px 20px rgba(26, 18, 24, 0.04);
+}
+
+.pf-lesson__job h2 {
+  margin: 0 0 0.35rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pf-accent2);
+}
+
+.pf-lesson__job p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.pf-lesson__note {
+  margin: 0 0 0.65rem;
+  padding: 0.7rem;
+  border-radius: 10px;
+  background: #fff;
+  border-left: 3px solid var(--pf-accent);
+}
+
+.pf-lesson__note code {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--pf-accent2);
+}
+
+.pf-lesson__note p {
+  margin: 0 0 0.45rem;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.pf-lesson__note pre {
+  margin: 0;
+  padding: 0.45rem;
+  border-radius: 6px;
+  background: #f8f5f2;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.pf-lesson__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pf-lesson__list li {
+  display: flex;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  color: var(--pf-muted);
+}
+
+.pf-lesson__list li.is-done {
+  color: #1a7a52;
+  background: rgba(26, 122, 82, 0.08);
+}
+
+.pf-lesson__cta {
+  display: none;
+}
+
+/* Builder stage */
+.pf-stage {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0.4rem 0.5rem 0.2rem;
+}
+
+.pf-code {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #1a1218;
+  border-top: 1px solid var(--pf-line);
+}
+
+.pf-code__tabs {
+  display: flex;
+  gap: 0;
+  padding: 0.35rem 0.5rem 0;
+  background: #120e14;
+}
+
+.pf-code__tabs button {
+  border: none;
+  background: transparent;
+  color: #8a7a82;
+  padding: 0.35rem 0.85rem;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+}
+
+.pf-code__tabs button.is-on {
+  background: #1a1218;
+  color: #fff;
+}
+
+.pf-code__tabs button.is-on[data-lang='html'] {
+  color: #b8a8ff;
+}
+
+.pf-code__tabs button.is-on[data-lang='css'] {
+  color: #ff8fb5;
+}
+
+.pf-code__hint {
+  margin: 0;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.68rem;
+  color: #8a7a82;
+  background: #1a1218;
+}
+
+.pf-code__editor {
+  flex: 1;
+  min-height: 0;
+}
+
+.pf-code__bar {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.35rem 0.55rem;
+  background: #120e14;
+  border-top: 1px solid #2a2030;
+}
+
+.pf-code__bar span {
+  margin-right: auto;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a7a82;
+}
+
+.pf-code__btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.pf-code__btn--ghost {
+  background: transparent;
+  color: #8a7a82;
+  border: 1px solid #3a3040;
+}
+
+.pf-code__btn--publish {
+  background: linear-gradient(135deg, var(--pf-accent), #ff9ec0);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(232, 93, 138, 0.45);
+}
+
+.pf-code__btn--next {
+  background: linear-gradient(135deg, var(--pf-accent2), #8b7dff);
+  color: #fff;
+}
+
+.pf-toast {
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.82rem;
+  background: #120e14;
+}
+
+.pf-toast--win {
+  color: #7dffc8;
+}
+
+.pf-toast--fail {
+  color: #ff8fb5;
+}
+
+.pf-phone-actions {
+  display: none;
+}
+
+/* Arena */
+.pf-build {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--pf-line);
+  box-shadow: 0 8px 32px rgba(26, 18, 24, 0.06);
+}
+
+.pf-build.is-live {
+  border-color: rgba(232, 93, 138, 0.35);
+  box-shadow: 0 0 0 3px rgba(232, 93, 138, 0.12), 0 12px 40px rgba(232, 93, 138, 0.15);
+}
+
+.pf-build__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.pf-build__kicker {
+  margin: 0;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pf-accent);
+  font-weight: 800;
+}
+
+.pf-build__top h2 {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.pf-build__pct {
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: var(--pf-card);
+  border: 1px solid var(--pf-line);
+}
+
+.pf-build__pct strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--pf-accent2);
+}
+
+.pf-build__pct span {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pf-muted);
+}
+
+.pf-build__profile {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.35rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px dashed rgba(232, 93, 138, 0.35);
+}
+
+.pf-build__photo {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pf-build__photo img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--pf-accent);
+  background: #f0e8f2;
+}
+
+.pf-build__photo span {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--pf-accent);
+  letter-spacing: 0.04em;
+}
+
+.pf-build__fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.pf-build__fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pf-muted);
+}
+
+.pf-build__fields input {
+  border: 1px solid var(--pf-line);
+  border-radius: 6px;
+  padding: 0.3rem 0.45rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  background: #fff;
+  color: var(--pf-ink);
+}
+
+.pf-build__sections {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.pf-build__sections span {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.2rem;
+  border-radius: 6px;
+  background: rgba(26, 18, 24, 0.04);
+  color: var(--pf-muted);
+  opacity: 0.45;
+}
+
+.pf-build__sections span.is-on {
+  opacity: 1;
+  background: rgba(91, 77, 255, 0.12);
+  color: var(--pf-accent2);
+}
+
+.pf-build__device {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #1a1218;
+  box-shadow: 0 16px 48px rgba(26, 18, 24, 0.15);
+}
+
+.pf-build__device-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.55rem;
+  background: #1a1218;
+}
+
+.pf-build__device-bar span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff8fb5;
+}
+
+.pf-build__device-bar span:nth-child(2) {
+  background: #f0c89a;
+}
+.pf-build__device-bar span:nth-child(3) {
+  background: #7dffc8;
+}
+
+.pf-build__device-bar strong {
+  margin-left: 0.35rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: #fff;
+}
+
+.pf-build__iframe {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: none;
+  background: #fff;
+}
+
+.pf-build__live-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.5rem 1.2rem;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--pf-accent);
+  border: 3px solid var(--pf-accent);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+}
+
+.pf-build__checks {
+  display: none;
+}
+
+.pf-build__coach {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.2rem;
+}
+
+.pf-build__face {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--pf-accent), var(--pf-accent2));
+}
+
+.pf-build__coach p {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: var(--pf-muted);
+}
+
+@media (max-width: 960px) {
+  .pf-phone-tabs {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .pf-phone-tabs button {
+    flex: 1;
+    border: 1px solid var(--pf-line);
+    border-radius: 8px;
+    padding: 0.45rem;
+    background: #fff;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.78rem;
+    color: var(--pf-muted);
+  }
+
+  .pf-phone-tabs button.is-on {
+    border-color: var(--pf-accent);
+    color: var(--pf-accent);
+  }
+
+  .pf-game__split {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .pf-lesson,
+  .pf-stage,
+  .pf-code {
+    display: none;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .pf-lesson.is-phone-on {
+    display: flex;
+  }
+
+  .pf-game.is-phone-build .pf-stage.is-phone-on {
+    display: block;
+  }
+
+  .pf-game.is-phone-build .pf-code.is-phone-on {
+    display: flex;
+  }
+
+  .pf-code__bar--desktop {
+    display: none;
+  }
+
+  .pf-phone-actions {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.45rem;
+    background: #120e14;
+  }
+
+  .pf-phone-actions .pf-code__btn--publish {
+    flex: 1;
+  }
+
+  .pf-lesson__cta {
+    display: block;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.65rem;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--pf-accent), var(--pf-accent2));
+    color: #fff;
+    font-family: inherit;
+    font-weight: 800;
+    cursor: pointer;
+  }
+}

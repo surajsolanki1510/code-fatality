@@ -5,7 +5,8 @@ import { LearnPanel } from '../components/LearnPanel'
 import { ArenaButton, QuestNav } from '../components/QuestNav'
 import { FatalityArena, type LockOutcome } from '../components/quest-visuals/FatalityArena'
 import { LiveQuestArena } from '../components/quest-visuals/LiveQuestArena'
-import { GlowUpArena } from '../components/quest-visuals/GlowUpArena'
+import { PortfolioBuilderArena } from '../components/quest-visuals/PortfolioBuilderArena'
+import { injectPortfolioHtml, usePortfolioStore } from '../store/portfolioStore'
 import { BRAND } from '../config/brand'
 import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests'
 import { buildPreviewDocument, validateQuest } from '../lib/validateQuest'
@@ -56,30 +57,32 @@ export function QuestPage() {
     setCodeLang('html')
   }, [quest])
 
+  const portfolioProfile = usePortfolioStore()
+
   const isCssForest = quest?.worldId === 'css-forest'
+
+  const portfolioHtml = useMemo(() => {
+    if (!isCssForest) return deferredHtml
+    return injectPortfolioHtml(deferredHtml, portfolioProfile)
+  }, [deferredHtml, isCssForest, portfolioProfile])
 
   const liveCheck = useMemo(() => {
     if (!quest) return null
-    if (isCssForest) return validateQuest(quest.id, deferredHtml, deferredCss)
+    if (isCssForest) return validateQuest(quest.id, portfolioHtml, deferredCss)
     return validateQuest(
       quest.id,
       deferredHtml,
       quest.starterCss !== undefined ? deferredCss : undefined,
     )
-  }, [quest, deferredHtml, deferredCss, isCssForest])
+  }, [quest, portfolioHtml, deferredHtml, deferredCss, isCssForest])
 
   const previewSrcDoc = useMemo(() => {
     if (!quest) return ''
-    if (isCssForest) return buildPreviewDocument(deferredHtml, deferredCss || undefined)
+    if (isCssForest) return buildPreviewDocument(portfolioHtml, deferredCss || undefined)
     const htmlSource = quest.starterCss !== undefined ? quest.starterHtml : deferredHtml
     const cssSource = quest.starterCss !== undefined ? deferredCss : deferredCss || undefined
     return buildPreviewDocument(htmlSource, cssSource)
-  }, [deferredHtml, deferredCss, quest, isCssForest])
-
-  const rawPreviewSrcDoc = useMemo(() => {
-    if (!quest || !isCssForest) return ''
-    return buildPreviewDocument(quest.starterHtml, quest.starterCss ?? undefined)
-  }, [quest, isCssForest])
+  }, [portfolioHtml, deferredHtml, deferredCss, quest, isCssForest])
 
   const editorLanguage = quest?.starterCss !== undefined ? 'css' : 'html'
   const editorValue = editorLanguage === 'css' ? css : html
@@ -130,7 +133,7 @@ export function QuestPage() {
   const runCheck = useCallback(() => {
     if (!quest) return
     const outcome = isCssForest
-      ? validateQuest(quest.id, html, css)
+      ? validateQuest(quest.id, injectPortfolioHtml(html, portfolioProfile), css)
       : validateQuest(quest.id, html, quest.starterCss !== undefined ? css : undefined)
     if (outcome.passed) {
       if (!isQuestComplete(quest.id)) {
@@ -151,7 +154,7 @@ export function QuestPage() {
       // Allow another fail strike later
       window.setTimeout(() => setLockOutcome('idle'), 600)
     }
-  }, [quest, html, css, completeQuest, isQuestComplete, failIndex, isCssForest])
+  }, [quest, html, css, completeQuest, isQuestComplete, failIndex, isCssForest, portfolioProfile])
 
   if (!quest) {
     return (
@@ -196,47 +199,37 @@ export function QuestPage() {
       setLockOutcome('idle')
     }
 
-    const glowCoach =
+    const packLabel = quest.story[0]?.replace('Portfolio section: ', '') ?? 'CSS'
+    const coachLine =
       lockOutcome === 'win'
-        ? 'ICONIC. You just made that page look expensive.'
+        ? 'Section saved to your portfolio. It\'s looking hire-ready.'
         : lockOutcome === 'fail'
-          ? 'Almost — tick the checklist one by one. No stress.'
+          ? 'Tick the checklist — one CSS idea at a time.'
           : passedCount === 0
-            ? 'Start with HTML structure, then add CSS color. You’ve got this.'
+            ? `This level teaches ${packLabel}. Style it on YOUR portfolio.`
             : passedCount < totalCount
-              ? `Nice — ${passedCount}/${totalCount} done. Keep going.`
-              : 'All goals lit. Hit POST GLOW UP.'
+              ? `${passedCount}/${totalCount} done — keep building.`
+              : 'Ready! Hit PUBLISH SECTION.'
 
     const lesson = quest.tagLessons[0]
 
     return (
-      <div className={`glow-up-game${phoneTab === 'code' ? ' is-phone-glow' : ''}`}>
-        <header className="glow-up-game__nav">
-          <Link to={`/world/${quest.worldId}`}>← Studio</Link>
-          <span className="glow-up-game__brand">{BRAND.short}</span>
-          <Link to={`/notebook/${quest.worldId}`} className="glow-up-game__notebook">
-            Notebook
-          </Link>
-          <span className="glow-up-game__chap">
-            GLOW {quest.chapter}
+      <div className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}`}>
+        <header className="pf-game__nav">
+          <Link to={`/world/${quest.worldId}`}>← Portfolio</Link>
+          <span className="pf-game__brand">PORTFOLIO FORGE</span>
+          <span className="pf-game__chap">
+            LVL {quest.chapter} · {packLabel}
             {quest.kind === 'boss' ? ' · BOSS' : ''}
           </span>
         </header>
 
-        <nav className="glow-up-phone-tabs" aria-label="Studio sections">
-          <button
-            type="button"
-            className={phoneTab === 'learn' ? 'is-on' : ''}
-            onClick={() => setPhoneTab('learn')}
-          >
+        <nav className="pf-phone-tabs" aria-label="Sections">
+          <button type="button" className={phoneTab === 'learn' ? 'is-on' : ''} onClick={() => setPhoneTab('learn')}>
             Learn
           </button>
-          <button
-            type="button"
-            className={phoneTab === 'code' ? 'is-on' : ''}
-            onClick={() => setPhoneTab('code')}
-          >
-            Makeover
+          <button type="button" className={phoneTab === 'code' ? 'is-on' : ''} onClick={() => setPhoneTab('code')}>
+            Build
             {passedCount > 0 && (
               <span className="fatality-phone-tabs__badge">
                 {passedCount}/{totalCount}
@@ -245,23 +238,20 @@ export function QuestPage() {
           </button>
         </nav>
 
-        <div className="glow-up-game__split">
-          <aside className={`glow-up-teach${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
-            <div className="glow-up-teach__scroll">
-              <span className="glow-up-easy__pill">
-                {quest.tier} · level {quest.chapter}
-              </span>
-              <h1 className="glow-up-easy__title">{quest.title}</h1>
-              <p className="glow-up-easy__hook">{quest.hook}</p>
+        <div className="pf-game__split">
+          <aside className={`pf-lesson${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
+            <div className="pf-lesson__scroll">
+              <span className="pf-lesson__pack">{packLabel} PACK · {quest.tier}</span>
+              <h1 className="pf-lesson__title">{quest.title}</h1>
+              <p className="pf-lesson__hook">{quest.hook}</p>
 
-              <div className="glow-up-easy__card">
-                <h2>Your job</h2>
-                <p>{quest.missionBrief ?? quest.lessonSummary}</p>
+              <div className="pf-lesson__job">
+                <h2>Add to your portfolio</h2>
+                <p>{quest.missionBrief}</p>
               </div>
 
               {lesson && (
-                <div className="glow-up-easy__learn">
-                  <h2>In plain English</h2>
+                <div className="pf-lesson__note">
                   <code>{lesson.tag}</code>
                   <p>{lesson.purpose}</p>
                   <pre>{lesson.example}</pre>
@@ -269,75 +259,66 @@ export function QuestPage() {
               )}
 
               {quest.tagLessons[1] && (
-                <div className="glow-up-easy__learn">
-                  <h2>Also this</h2>
+                <div className="pf-lesson__note">
                   <code>{quest.tagLessons[1].tag}</code>
                   <p>{quest.tagLessons[1].purpose}</p>
                   <pre>{quest.tagLessons[1].example}</pre>
                 </div>
               )}
 
-              <div className="glow-up-easy__card">
-                <h2>Checklist</h2>
-                <ul className="glow-up-easy__goals">
-                  {quest.objectives.map((obj) => {
-                    const done = liveCheck?.results.find((r) => r.id === obj.id)?.passed ?? false
-                    return (
-                      <li key={obj.id} className={done ? 'is-done' : ''}>
-                        <span>{done ? '✓' : '○'}</span>
-                        {obj.label}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
+              <ul className="pf-lesson__list">
+                {quest.objectives.map((obj) => {
+                  const done = liveCheck?.results.find((r) => r.id === obj.id)?.passed ?? false
+                  return (
+                    <li key={obj.id} className={done ? 'is-done' : ''}>
+                      <span>{done ? '✓' : '○'}</span>
+                      {obj.label}
+                    </li>
+                  )
+                })}
+              </ul>
 
-              <button type="button" className="glow-up-phone-cta" onClick={() => setPhoneTab('code')}>
-                Start makeover →
+              <button type="button" className="pf-lesson__cta" onClick={() => setPhoneTab('code')}>
+                Open portfolio builder →
               </button>
             </div>
           </aside>
 
-          <section className={`glow-up-play${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <GlowUpArena
+          <section className={`pf-stage${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+            <PortfolioBuilderArena
               quest={quest}
               previewSrcDoc={previewSrcDoc}
-              rawPreviewSrcDoc={rawPreviewSrcDoc}
               checkResults={liveCheck?.results}
-              coachLine={glowCoach}
-              posted={lockOutcome === 'win'}
+              coachLine={coachLine}
+              published={lockOutcome === 'win'}
             />
           </section>
 
-          <div className={`glow-up-editor${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <div className="glow-up-editor__tabs" role="tablist" aria-label="Code language">
+          <div className={`pf-code${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+            <div className="pf-code__tabs" role="tablist">
               <button
                 type="button"
-                role="tab"
                 data-lang="html"
                 className={codeLang === 'html' ? 'is-on' : ''}
-                aria-selected={codeLang === 'html'}
                 onClick={() => setCodeLang('html')}
               >
                 HTML
               </button>
               <button
                 type="button"
-                role="tab"
                 data-lang="css"
                 className={codeLang === 'css' ? 'is-on' : ''}
-                aria-selected={codeLang === 'css'}
                 onClick={() => setCodeLang('css')}
               >
                 CSS
               </button>
             </div>
-            <p className="glow-up-editor__hint-line">
+            <p className="pf-code__hint">
               {codeLang === 'html'
-                ? 'HTML = the structure (boxes & text). Switch to CSS for colors & layout.'
-                : 'CSS = the glow (colors, space, motion). Switch to HTML if you need more boxes.'}
+                ? 'HTML = portfolio structure. Use {{NAME}} {{PHOTO}} {{TAGLINE}} {{ABOUT}} placeholders.'
+                : `CSS = ${packLabel} styling. All rules for this pack go here.`}
             </p>
-            <div className="glow-up-editor__monaco">
+            <div className="pf-code__editor">
               {isPhone ? (
                 <textarea
                   className="fatality-editor__textarea"
@@ -348,8 +329,6 @@ export function QuestPage() {
                     onCodeChange()
                   }}
                   spellCheck={false}
-                  autoCapitalize="off"
-                  autoCorrect="off"
                 />
               ) : (
                 <Editor
@@ -366,46 +345,38 @@ export function QuestPage() {
                 />
               )}
             </div>
-            <div className="glow-up-editor__bar glow-up-editor__bar--desktop">
-              <span className="glow-up-editor__label">One thing at a time</span>
-              <button type="button" className="glow-up-editor__btn glow-up-editor__btn--ghost" onClick={showHint}>
+            <div className="pf-code__bar pf-code__bar--desktop">
+              <span>Your portfolio code</span>
+              <button type="button" className="pf-code__btn pf-code__btn--ghost" onClick={showHint}>
                 Hint
               </button>
-              <button type="button" className="glow-up-editor__btn glow-up-editor__btn--post" onClick={runCheck}>
-                POST GLOW UP
+              <button type="button" className="pf-code__btn pf-code__btn--publish" onClick={runCheck}>
+                PUBLISH SECTION
               </button>
               {feedback?.type === 'win' && nextQuest && (
-                <button
-                  type="button"
-                  className="glow-up-editor__btn glow-up-editor__btn--next"
-                  onClick={() => navigate(`/quest/${nextQuest.id}`)}
-                >
+                <button type="button" className="pf-code__btn pf-code__btn--next" onClick={() => navigate(`/quest/${nextQuest.id}`)}>
                   Next →
                 </button>
               )}
             </div>
             {feedback && (
-              <p className={`glow-up-toast glow-up-toast--${feedback.type}`}>
-                {showVictory && !alreadyDone && <strong>ICONIC · </strong>}
+              <p className={`pf-toast pf-toast--${feedback.type}`}>
+                {showVictory && !alreadyDone && <strong>SAVED · </strong>}
                 {feedback.text}
               </p>
             )}
           </div>
         </div>
 
-        <div className="glow-up-phone-actions">
-          <button type="button" className="glow-up-editor__btn glow-up-editor__btn--ghost" onClick={showHint}>
+        <div className="pf-phone-actions">
+          <button type="button" className="pf-code__btn pf-code__btn--ghost" onClick={showHint}>
             Hint
           </button>
-          <button type="button" className="glow-up-editor__btn glow-up-editor__btn--post" onClick={onPostGlow}>
-            POST GLOW UP
+          <button type="button" className="pf-code__btn pf-code__btn--publish" onClick={onPostGlow}>
+            PUBLISH SECTION
           </button>
           {feedback?.type === 'win' && nextQuest && (
-            <button
-              type="button"
-              className="glow-up-editor__btn glow-up-editor__btn--next"
-              onClick={() => navigate(`/quest/${nextQuest.id}`)}
-            >
+            <button type="button" className="pf-code__btn pf-code__btn--next" onClick={() => navigate(`/quest/${nextQuest.id}`)}>
               Next →
             </button>
           )}

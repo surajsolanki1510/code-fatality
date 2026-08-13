@@ -166,7 +166,12 @@ function sourceHasAttr(html: string, tag: string, attrName: string, attrValue?: 
   return false
 }
 
+import { validateCssPortfolio } from './validateCssPortfolio'
+
 export function validateQuest(questId: string, html: string, css?: string): ValidationOutcome {
+  const portfolioResult = validateCssPortfolio(questId, html, css ?? '')
+  if (portfolioResult) return portfolioResult
+
   const doc = parseDoc(html)
   const checks: CheckResult[] = []
 
