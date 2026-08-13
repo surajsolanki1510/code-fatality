@@ -28,11 +28,12 @@ export const WORLDS: WorldDef[] = [
     id: 'css-forest',
     name: 'CSS Forest',
     subtitle: 'REALM II — STYLE',
-    description: 'STYLE FORGE — dress a neon runway with CSS. Beginner → Intermediate (16 looks).',
+    description:
+      'GLOW UP STUDIO — HTML + CSS beautification. Beginner → Intermediate → Expert (36 glows). Flex, grid, transitions, animations & more.',
     bannerClass: 'world-card__banner--css',
     art: '/art/world-css.jpg',
     accent: '#5dff9f',
-    bossQuestId: 'css-i-boss',
+    bossQuestId: 'css-e-boss',
   },
   {
     id: 'js-arena',

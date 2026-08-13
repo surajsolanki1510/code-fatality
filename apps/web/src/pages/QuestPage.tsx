@@ -5,7 +5,7 @@ import { LearnPanel } from '../components/LearnPanel'
 import { ArenaButton, QuestNav } from '../components/QuestNav'
 import { FatalityArena, type LockOutcome } from '../components/quest-visuals/FatalityArena'
 import { LiveQuestArena } from '../components/quest-visuals/LiveQuestArena'
-import { StyleForgeArena } from '../components/quest-visuals/StyleForgeArena'
+import { GlowUpArena } from '../components/quest-visuals/GlowUpArena'
 import { BRAND } from '../config/brand'
 import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests'
 import { buildPreviewDocument, validateQuest } from '../lib/validateQuest'
@@ -54,20 +54,30 @@ export function QuestPage() {
     setPhoneTab('learn')
   }, [quest])
 
+  const isCssForest = quest?.worldId === 'css-forest'
+
   const liveCheck = useMemo(() => {
     if (!quest) return null
+    if (isCssForest) return validateQuest(quest.id, deferredHtml, deferredCss)
     return validateQuest(
       quest.id,
       deferredHtml,
       quest.starterCss !== undefined ? deferredCss : undefined,
     )
-  }, [quest, deferredHtml, deferredCss])
+  }, [quest, deferredHtml, deferredCss, isCssForest])
 
   const previewSrcDoc = useMemo(() => {
-    const htmlSource = quest?.starterCss !== undefined ? quest.starterHtml : deferredHtml
-    const cssSource = quest?.starterCss !== undefined ? deferredCss : deferredCss || undefined
+    if (!quest) return ''
+    if (isCssForest) return buildPreviewDocument(deferredHtml, deferredCss || undefined)
+    const htmlSource = quest.starterCss !== undefined ? quest.starterHtml : deferredHtml
+    const cssSource = quest.starterCss !== undefined ? deferredCss : deferredCss || undefined
     return buildPreviewDocument(htmlSource, cssSource)
-  }, [deferredHtml, deferredCss, quest])
+  }, [deferredHtml, deferredCss, quest, isCssForest])
+
+  const rawPreviewSrcDoc = useMemo(() => {
+    if (!quest || !isCssForest) return ''
+    return buildPreviewDocument(quest.starterHtml, quest.starterCss ?? undefined)
+  }, [quest, isCssForest])
 
   const editorLanguage = quest?.starterCss !== undefined ? 'css' : 'html'
   const editorValue = editorLanguage === 'css' ? css : html
@@ -117,7 +127,9 @@ export function QuestPage() {
 
   const runCheck = useCallback(() => {
     if (!quest) return
-    const outcome = validateQuest(quest.id, html, quest.starterCss !== undefined ? css : undefined)
+    const outcome = isCssForest
+      ? validateQuest(quest.id, html, css)
+      : validateQuest(quest.id, html, quest.starterCss !== undefined ? css : undefined)
     if (outcome.passed) {
       if (!isQuestComplete(quest.id)) {
         completeQuest(quest.id, quest.xp, quest.badgeId)
@@ -137,7 +149,7 @@ export function QuestPage() {
       // Allow another fail strike later
       window.setTimeout(() => setLockOutcome('idle'), 600)
     }
-  }, [quest, html, css, completeQuest, isQuestComplete, failIndex])
+  }, [quest, html, css, completeQuest, isQuestComplete, failIndex, isCssForest])
 
   if (!quest) {
     return (
@@ -161,7 +173,6 @@ export function QuestPage() {
 
   const alreadyDone = isQuestComplete(quest.id)
   const isHtmlVillage = quest.worldId === 'html-village'
-  const isCssForest = quest.worldId === 'css-forest'
 
   if (isCssForest) {
     const showHint = () => {
@@ -173,39 +184,44 @@ export function QuestPage() {
       }
     }
 
-    const onLockLook = () => {
+    const onPostGlow = () => {
       runCheck()
       setPhoneTab('code')
     }
 
-    const styleCoach =
+    const onCodeChange = () => {
+      if (lockOutcome === 'win') return
+      setLockOutcome('idle')
+    }
+
+    const glowCoach =
       lockOutcome === 'win'
         ? quest.realWorldWin
-          ? `LOOK LOCKED. ${quest.realWorldWin}`
-          : 'LOOK LOCKED. The runway felt that drip.'
+          ? `POSTED. ${quest.realWorldWin}`
+          : 'POSTED. That glow is immaculate.'
         : lockOutcome === 'fail'
-          ? 'Vibe rejected — fix the CSS and lock the look again.'
+          ? 'Not quite aesthetic — fix HTML structure or CSS polish and post again.'
           : passedCount === 0
-            ? (quest.missionBrief ?? 'Dress the neon runway with CSS.')
+            ? (quest.missionBrief ?? 'Beautify the dump — edit HTML and CSS together.')
             : passedCount < totalCount
-              ? `Vibe ${passedCount}/${totalCount} — keep styling, then LOCK LOOK.`
-              : 'Full vibe ready. Smash LOCK LOOK.'
+              ? `Glow ${passedCount}/${totalCount} — keep building, then POST GLOW UP.`
+              : 'Full glow ready. Hit POST GLOW UP.'
 
     return (
-      <div className={`style-forge-game${phoneTab === 'code' ? ' is-phone-style' : ''}`}>
-        <header className="style-forge-game__nav">
-          <Link to={`/world/${quest.worldId}`}>← Looks</Link>
-          <span className="style-forge-game__brand">{BRAND.short}</span>
-          <Link to={`/notebook/${quest.worldId}`} className="style-forge-game__notebook">
+      <div className={`glow-up-game${phoneTab === 'code' ? ' is-phone-glow' : ''}`}>
+        <header className="glow-up-game__nav">
+          <Link to={`/world/${quest.worldId}`}>← Studio</Link>
+          <span className="glow-up-game__brand">{BRAND.short}</span>
+          <Link to={`/notebook/${quest.worldId}`} className="glow-up-game__notebook">
             Notebook
           </Link>
-          <span className="style-forge-game__chap">
-            {quest.tier.toUpperCase()} · LOOK {quest.chapter}
+          <span className="glow-up-game__chap">
+            {quest.tier.toUpperCase()} · GLOW {quest.chapter}
             {quest.kind === 'boss' ? ' · BOSS' : ''}
           </span>
         </header>
 
-        <nav className="style-forge-phone-tabs" aria-label="Style sections">
+        <nav className="glow-up-phone-tabs" aria-label="Studio sections">
           <button
             type="button"
             className={phoneTab === 'learn' ? 'is-on' : ''}
@@ -218,7 +234,7 @@ export function QuestPage() {
             className={phoneTab === 'code' ? 'is-on' : ''}
             onClick={() => setPhoneTab('code')}
           >
-            Style
+            Build
             {passedCount > 0 && (
               <span className="fatality-phone-tabs__badge">
                 {passedCount}/{totalCount}
@@ -227,18 +243,18 @@ export function QuestPage() {
           </button>
         </nav>
 
-        <div className="style-forge-game__split">
-          <aside className={`style-forge-teach${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
-            <div className="style-forge-teach__scroll">
+        <div className="glow-up-game__split">
+          <aside className={`glow-up-teach${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
+            <div className="glow-up-teach__scroll">
               <div className="fatality-teach__level">
-                <span className="fatality-teach__level-pill">Look {quest.chapter}</span>
-                {quest.kind === 'boss' && <span>BOSS LOOK</span>}
+                <span className="fatality-teach__level-pill">Glow {quest.chapter}</span>
+                {quest.kind === 'boss' && <span>BOSS GLOW</span>}
               </div>
               <h1 className="fatality-teach__title">{quest.title}</h1>
               <p className="fatality-teach__hook">{quest.hook}</p>
               {quest.missionBrief && (
                 <div className="fatality-mission-brief">
-                  <h2>Style this</h2>
+                  <h2>Beautify this</h2>
                   <p>{quest.missionBrief}</p>
                   {quest.realWorldWin && (
                     <p className="fatality-mission-brief__real">
@@ -248,7 +264,7 @@ export function QuestPage() {
                 </div>
               )}
               <div className="fatality-explain">
-                <h2>How the CSS works</h2>
+                <h2>How HTML + CSS work together</h2>
                 <p>{quest.lessonSummary}</p>
                 {quest.tagLessons.map((lesson) => (
                   <article key={`${quest.id}-${lesson.tag}`} className="fatality-tag-card">
@@ -271,7 +287,7 @@ export function QuestPage() {
                 ))}
               </div>
               <div className="fatality-missions">
-                <h2>Style goals</h2>
+                <h2>Glow goals</h2>
                 <ul>
                   {quest.objectives.map((obj) => {
                     const done = liveCheck?.results.find((r) => r.id === obj.id)?.passed ?? false
@@ -284,91 +300,124 @@ export function QuestPage() {
                   })}
                 </ul>
               </div>
-              <button type="button" className="style-forge-phone-cta" onClick={() => setPhoneTab('code')}>
-                Enter the runway →
+              <button type="button" className="glow-up-phone-cta" onClick={() => setPhoneTab('code')}>
+                Open the studio →
               </button>
             </div>
           </aside>
 
-          <section className={`style-forge-play${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <StyleForgeArena
+          <section className={`glow-up-play${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+            <GlowUpArena
               quest={quest}
-              css={css}
               previewSrcDoc={previewSrcDoc}
+              rawPreviewSrcDoc={rawPreviewSrcDoc}
               checkResults={liveCheck?.results}
-              coachLine={styleCoach}
-              lockedLook={lockOutcome === 'win'}
+              coachLine={glowCoach}
+              posted={lockOutcome === 'win'}
             />
           </section>
 
-          <div className={`style-forge-editor${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <div className="style-forge-editor__bar style-forge-editor__bar--desktop">
-              <span className="style-forge-editor__label">Your CSS</span>
-              <button type="button" className="style-forge-editor__btn style-forge-editor__btn--ghost" onClick={showHint}>
+          <div className={`glow-up-editor${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+            <div className="glow-up-editor__dual">
+              <div className="glow-up-editor__pane">
+                <div className="glow-up-editor__pane-head glow-up-editor__pane-head--html">HTML</div>
+                <div className="glow-up-editor__monaco">
+                  {isPhone ? (
+                    <textarea
+                      className="fatality-editor__textarea"
+                      value={html}
+                      onChange={(e) => {
+                        setHtml(e.target.value)
+                        onCodeChange()
+                      }}
+                      spellCheck={false}
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                    />
+                  ) : (
+                    <Editor
+                      height="100%"
+                      language="html"
+                      theme="vs-dark"
+                      value={html}
+                      onChange={(v) => {
+                        setHtml(v ?? '')
+                        onCodeChange()
+                      }}
+                      options={editorOptions}
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="glow-up-editor__pane">
+                <div className="glow-up-editor__pane-head glow-up-editor__pane-head--css">CSS</div>
+                <div className="glow-up-editor__monaco">
+                  {isPhone ? (
+                    <textarea
+                      className="fatality-editor__textarea"
+                      value={css}
+                      onChange={(e) => {
+                        setCss(e.target.value)
+                        onCodeChange()
+                      }}
+                      spellCheck={false}
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                    />
+                  ) : (
+                    <Editor
+                      height="100%"
+                      language="css"
+                      theme="vs-dark"
+                      value={css}
+                      onChange={(v) => {
+                        setCss(v ?? '')
+                        onCodeChange()
+                      }}
+                      options={editorOptions}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="glow-up-editor__bar glow-up-editor__bar--desktop">
+              <span className="glow-up-editor__label">HTML + CSS · live preview above</span>
+              <button type="button" className="glow-up-editor__btn glow-up-editor__btn--ghost" onClick={showHint}>
                 Hint
               </button>
-              <button type="button" className="style-forge-editor__btn style-forge-editor__btn--check" onClick={runCheck}>
-                LOCK LOOK
+              <button type="button" className="glow-up-editor__btn glow-up-editor__btn--post" onClick={runCheck}>
+                POST GLOW UP
               </button>
               {feedback?.type === 'win' && nextQuest && (
                 <button
                   type="button"
-                  className="style-forge-editor__btn style-forge-editor__btn--next"
+                  className="glow-up-editor__btn glow-up-editor__btn--next"
                   onClick={() => navigate(`/quest/${nextQuest.id}`)}
                 >
                   Next →
                 </button>
               )}
             </div>
-            <div className="style-forge-editor__monaco">
-              {isPhone ? (
-                <textarea
-                  className="fatality-editor__textarea"
-                  value={css}
-                  onChange={(e) => {
-                    setCss(e.target.value)
-                    if (lockOutcome === 'win') return
-                    setLockOutcome('idle')
-                  }}
-                  spellCheck={false}
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                />
-              ) : (
-                <Editor
-                  height="100%"
-                  language="css"
-                  theme="vs-dark"
-                  value={css}
-                  onChange={(v) => {
-                    setCss(v ?? '')
-                    if (lockOutcome === 'win') return
-                    setLockOutcome('idle')
-                  }}
-                  options={editorOptions}
-                />
-              )}
-            </div>
             {feedback && (
-              <p className={`style-forge-toast style-forge-toast--${feedback.type}`}>
-                {showVictory && !alreadyDone && <strong>LOOK LOCKED · </strong>}
+              <p className={`glow-up-toast glow-up-toast--${feedback.type}`}>
+                {showVictory && !alreadyDone && <strong>POSTED · </strong>}
                 {feedback.text}
               </p>
             )}
           </div>
         </div>
 
-        <div className="style-forge-phone-actions">
-          <button type="button" className="style-forge-editor__btn style-forge-editor__btn--ghost" onClick={showHint}>
+        <div className="glow-up-phone-actions">
+          <button type="button" className="glow-up-editor__btn glow-up-editor__btn--ghost" onClick={showHint}>
             Hint
           </button>
-          <button type="button" className="style-forge-editor__btn style-forge-editor__btn--check" onClick={onLockLook}>
-            LOCK LOOK
+          <button type="button" className="glow-up-editor__btn glow-up-editor__btn--post" onClick={onPostGlow}>
+            POST GLOW UP
           </button>
           {feedback?.type === 'win' && nextQuest && (
             <button
               type="button"
-              className="style-forge-editor__btn style-forge-editor__btn--next"
+              className="glow-up-editor__btn glow-up-editor__btn--next"
               onClick={() => navigate(`/quest/${nextQuest.id}`)}
             >
               Next →

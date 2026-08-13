@@ -120,6 +120,34 @@ function countClosedItemsWithText(html: string, parent: string, child: string, m
   })
 }
 
+function hasClassTag(html: string, tag: string, className: string): boolean {
+  const re = new RegExp(`<${tag}\\b[^>]*class\\s*=\\s*["'][^"']*\\b${className}\\b`, 'i')
+  return re.test(html)
+}
+
+function countClassTag(html: string, tag: string, className: string, min: number): boolean {
+  const re = new RegExp(`<${tag}\\b[^>]*class\\s*=\\s*["'][^"']*\\b${className}\\b`, 'gi')
+  let count = 0
+  while (re.exec(html) !== null) count += 1
+  return count >= min
+}
+
+function hasClassWithContent(html: string, tag: string, className: string): boolean {
+  const re = new RegExp(`<${tag}\\b([^>]*)>([\\s\\S]*?)<\\/${tag}\\s*>`, 'gi')
+  let match: RegExpExecArray | null
+  while ((match = re.exec(html)) !== null) {
+    const attrs = match[1] ?? ''
+    const inner = match[2] ?? ''
+    if (
+      new RegExp(`class\\s*=\\s*["'][^"']*\\b${className}\\b`, 'i').test(attrs) &&
+      (textOnly(inner).length > 0 || hasChildElement(inner))
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 function sourceHasAttr(html: string, tag: string, attrName: string, attrValue?: string): boolean {
   const re = new RegExp(`<${tag}\\b([^>]*)>`, 'gi')
   let match: RegExpExecArray | null
@@ -581,6 +609,16 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
     case 'css-b01': {
       const sheet = css ?? ''
       checks.push({
+        id: 'html-studio',
+        passed: hasClassTag(html, 'div', 'studio'),
+        message: 'Wrap content in <div class="studio">',
+      })
+      checks.push({
+        id: 'html-title',
+        passed: hasClassTag(html, 'h1', 'title') && hasCompleteWithText(html, 'h1'),
+        message: 'Add <h1 class="title"> with text',
+      })
+      checks.push({
         id: 'body-bg',
         passed: /body\s*\{[^}]*background(-color)?\s*:/i.test(sheet),
         message: 'Set background on body { }',
@@ -589,6 +627,11 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
     }
     case 'css-b02': {
       const sheet = css ?? ''
+      checks.push({
+        id: 'html-tag',
+        passed: hasClassTag(html, 'p', 'tag') && hasCompleteWithText(html, 'p'),
+        message: 'Add <p class="tag"> with text',
+      })
       checks.push({
         id: 'title-color',
         passed: /\.title\s*\{[^}]*color\s*:/i.test(sheet),
@@ -614,8 +657,8 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
       const sheet = css ?? ''
       checks.push({
         id: 'align-center',
-        passed: /\.runway\s*\{[^}]*text-align\s*:\s*center/i.test(sheet),
-        message: 'Center .runway with text-align: center',
+        passed: /\.studio\s*\{[^}]*text-align\s*:\s*center/i.test(sheet),
+        message: 'Center .studio with text-align: center',
       })
       checks.push({
         id: 'tracking',
@@ -626,6 +669,11 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
     }
     case 'css-b05': {
       const sheet = css ?? ''
+      checks.push({
+        id: 'html-card',
+        passed: hasClassWithContent(html, 'div', 'card'),
+        message: 'Add <div class="card"> with content inside',
+      })
       checks.push({
         id: 'card-pad',
         passed: /\.card\s*\{[^}]*padding\s*:/i.test(sheet),
@@ -672,6 +720,11 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
     case 'css-b08': {
       const sheet = css ?? ''
       checks.push({
+        id: 'html-row',
+        passed: hasClassTag(html, 'div', 'row') && countClassTag(html, 'div', 'tile', 3),
+        message: 'Add <div class="row"> with 3+ <div class="tile">',
+      })
+      checks.push({
         id: 'row-flex',
         passed: /\.row\s*\{[^}]*display\s*:\s*flex/i.test(sheet),
         message: 'Set display: flex on .row',
@@ -699,8 +752,61 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
       })
       break
     }
+    case 'css-b10': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'box-sizing',
+        passed: /box-sizing\s*:\s*border-box/i.test(sheet),
+        message: 'Set box-sizing: border-box',
+      })
+      checks.push({
+        id: 'card-margin',
+        passed: /\.card\s*\{[^}]*margin(-[a-z]+)?\s*:/i.test(sheet),
+        message: 'Set margin on .card',
+      })
+      checks.push({
+        id: 'tile-pad',
+        passed: /\.tile\s*\{[^}]*padding\s*:/i.test(sheet),
+        message: 'Set padding on .tile',
+      })
+      break
+    }
+    case 'css-b11': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'badge-inline',
+        passed: /\.badge\s*\{[^}]*display\s*:\s*inline-block/i.test(sheet),
+        message: 'Set .badge { display: inline-block }',
+      })
+      checks.push({
+        id: 'bio-none',
+        passed: /\.bio\s*\{[^}]*display\s*:\s*none/i.test(sheet),
+        message: 'Set .bio { display: none }',
+      })
+      break
+    }
     case 'css-b-boss': {
       const sheet = css ?? ''
+      checks.push({
+        id: 'html-studio',
+        passed: hasClassTag(html, 'div', 'studio'),
+        message: '<div class="studio"> wrapper',
+      })
+      checks.push({
+        id: 'html-title',
+        passed: hasClassTag(html, 'h1', 'title') && hasCompleteWithText(html, 'h1'),
+        message: '<h1 class="title">',
+      })
+      checks.push({
+        id: 'html-card',
+        passed: hasClassWithContent(html, 'div', 'card'),
+        message: '<div class="card">',
+      })
+      checks.push({
+        id: 'html-row',
+        passed: hasClassTag(html, 'div', 'row') && countClassTag(html, 'div', 'tile', 3),
+        message: '<div class="row"> with tiles',
+      })
       checks.push({
         id: 'body-bg',
         passed: /body\s*\{[^}]*background(-color)?\s*:/i.test(sheet),
@@ -717,19 +823,9 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
         message: '.card padding',
       })
       checks.push({
-        id: 'card-radius',
-        passed: /\.card\s*\{[^}]*border-radius\s*:/i.test(sheet),
-        message: '.card border-radius',
-      })
-      checks.push({
         id: 'row-flex',
         passed: /\.row\s*\{[^}]*display\s*:\s*flex/i.test(sheet),
         message: '.row flex',
-      })
-      checks.push({
-        id: 'row-gap',
-        passed: /\.row\s*\{[^}]*gap\s*:/i.test(sheet),
-        message: '.row gap',
       })
       break
     }
@@ -774,9 +870,93 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
     case 'css-i05': {
       const sheet = css ?? ''
       checks.push({
+        id: 'tile-transform',
+        passed: /\.tile\s*:\s*hover\s*\{[^}]*transform\s*:[^;]*(scale|translate)/i.test(sheet),
+        message: 'Use transform (scale or translate) on .tile:hover',
+      })
+      break
+    }
+    case 'css-i06': {
+      const sheet = css ?? ''
+      checks.push({
         id: 'body-gradient',
         passed: /body\s*\{[^}]*(background(-color)?|background)\s*:[^;]*linear-gradient\s*\(/i.test(sheet),
         message: 'Use linear-gradient on body background',
+      })
+      break
+    }
+    case 'css-i07': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'card-rel',
+        passed: /\.card\s*\{[^}]*position\s*:\s*relative/i.test(sheet),
+        message: 'Set .card { position: relative }',
+      })
+      checks.push({
+        id: 'badge-abs',
+        passed: /\.badge\s*\{[^}]*position\s*:\s*absolute/i.test(sheet),
+        message: 'Set .badge { position: absolute }',
+      })
+      checks.push({
+        id: 'badge-place',
+        passed: /\.badge\s*\{[^}]*(top|right|left|bottom)\s*:/i.test(sheet),
+        message: 'Place .badge with top/right/left/bottom',
+      })
+      break
+    }
+    case 'css-i08': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'hero-sticky',
+        passed: /\.hero\s*\{[^}]*position\s*:\s*sticky/i.test(sheet),
+        message: 'Set .hero { position: sticky }',
+      })
+      checks.push({
+        id: 'hero-top',
+        passed: /\.hero\s*\{[^}]*top\s*:/i.test(sheet),
+        message: 'Set .hero { top: ... }',
+      })
+      checks.push({
+        id: 'hero-z',
+        passed: /\.hero\s*\{[^}]*z-index\s*:/i.test(sheet),
+        message: 'Set .hero { z-index: ... }',
+      })
+      break
+    }
+    case 'css-i09': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'pseudo',
+        passed: /\.title\s*::\s*(before|after)\s*\{[^}]*content\s*:/i.test(sheet),
+        message: 'Add .title::before or ::after with content',
+      })
+      break
+    }
+    case 'css-i10': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'cta-focus',
+        passed: /\.cta\s*:\s*focus\s*\{/i.test(sheet),
+        message: 'Style .cta:focus',
+      })
+      checks.push({
+        id: 'nth-odd',
+        passed: /\.tile\s*:\s*nth-child\s*\(\s*odd\s*\)\s*\{/i.test(sheet),
+        message: 'Style .tile:nth-child(odd)',
+      })
+      break
+    }
+    case 'css-i11': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'row-wrap',
+        passed: /\.row\s*\{[^}]*flex-wrap\s*:\s*wrap/i.test(sheet),
+        message: 'Set .row { flex-wrap: wrap }',
+      })
+      checks.push({
+        id: 'tile-grow',
+        passed: /\.tile\s*\{[^}]*flex(-grow)?\s*:/i.test(sheet),
+        message: 'Set .tile { flex: 1 } or flex-grow',
       })
       break
     }
@@ -803,6 +983,183 @@ export function validateQuest(questId: string, html: string, css?: string): Vali
         id: 'tile-hover',
         passed: /\.tile\s*:\s*hover\s*\{/i.test(sheet),
         message: '.tile:hover',
+      })
+      checks.push({
+        id: 'tile-transition',
+        passed: /\.tile\s*\{[^}]*transition\s*:/i.test(sheet),
+        message: '.tile transition',
+      })
+      break
+    }
+    case 'css-e01': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'css-var',
+        passed: /--[a-zA-Z][\w-]*\s*:/i.test(sheet),
+        message: 'Define a CSS custom property (--name)',
+      })
+      checks.push({
+        id: 'css-var-use',
+        passed: /var\s*\(\s*--[a-zA-Z][\w-]*/i.test(sheet),
+        message: 'Use var(--...) somewhere',
+      })
+      break
+    }
+    case 'css-e02':
+    case 'css-e04': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'keyframes',
+        passed: /@keyframes\s+[\w-]+\s*\{/i.test(sheet),
+        message: 'Add @keyframes { ... }',
+      })
+      checks.push({
+        id: 'animation',
+        passed: /animation(-name)?\s*:/i.test(sheet),
+        message: 'Apply animation to an element',
+      })
+      break
+    }
+    case 'css-e03': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'keyframes',
+        passed: /@keyframes\s+[\w-]+\s*\{/i.test(sheet),
+        message: 'Add @keyframes',
+      })
+      checks.push({
+        id: 'anim-duration',
+        passed: /animation-duration\s*:/i.test(sheet) || /animation\s*:[^;]*\d/i.test(sheet),
+        message: 'Set animation duration',
+      })
+      checks.push({
+        id: 'anim-iter',
+        passed:
+          /animation-iteration-count\s*:/i.test(sheet) ||
+          /animation\s*:[^;]*\binfinite\b/i.test(sheet) ||
+          /animation\s*:[^;]*\b\d+\b/i.test(sheet),
+        message: 'Set iteration count or infinite',
+      })
+      break
+    }
+    case 'css-e05': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'filter',
+        passed: /\.(card|tile)\s*\{[^}]*filter\s*:/i.test(sheet) || /filter\s*:\s*(blur|brightness|contrast|drop-shadow|grayscale|saturate)/i.test(sheet),
+        message: 'Set filter: ... on .card or .tile',
+      })
+      break
+    }
+    case 'css-e06': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'backdrop',
+        passed: /backdrop-filter\s*:\s*blur\s*\(/i.test(sheet),
+        message: 'Set backdrop-filter: blur(...)',
+      })
+      break
+    }
+    case 'css-e07': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'media',
+        passed: /@media\s*\([^)]*max-width/i.test(sheet),
+        message: 'Add @media (max-width: ...)',
+      })
+      checks.push({
+        id: 'media-rule',
+        passed: /@media[^{]*\{[\s\S]*?(grid-template-columns|display|flex-direction|font-size|width)\s*:/i.test(
+          sheet,
+        ),
+        message: 'Change a layout property inside the media query',
+      })
+      break
+    }
+    case 'css-e08': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'autofit',
+        passed: /grid-template-columns\s*:\s*repeat\s*\(\s*auto-fit\s*,\s*minmax\s*\(/i.test(sheet),
+        message: 'Use repeat(auto-fit, minmax(...))',
+      })
+      break
+    }
+    case 'css-e09': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'overflow-x',
+        passed: /\.row\s*\{[^}]*overflow-x\s*:\s*(auto|scroll)/i.test(sheet),
+        message: 'Set overflow-x: auto/scroll on .row',
+      })
+      checks.push({
+        id: 'snap-type',
+        passed: /\.row\s*\{[^}]*scroll-snap-type\s*:/i.test(sheet),
+        message: 'Set scroll-snap-type on .row',
+      })
+      checks.push({
+        id: 'snap-align',
+        passed: /\.tile\s*\{[^}]*scroll-snap-align\s*:/i.test(sheet),
+        message: 'Set scroll-snap-align on .tile',
+      })
+      break
+    }
+    case 'css-e10': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'cubic',
+        passed: /cubic-bezier\s*\(/i.test(sheet),
+        message: 'Use cubic-bezier(...)',
+      })
+      break
+    }
+    case 'css-e11': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'opacity',
+        passed: /opacity\s*:\s*[\d.]+/i.test(sheet),
+        message: 'Set opacity: ...',
+      })
+      checks.push({
+        id: 'blend',
+        passed: /mix-blend-mode\s*:/i.test(sheet),
+        message: 'Set mix-blend-mode: ...',
+      })
+      break
+    }
+    case 'css-e-boss': {
+      const sheet = css ?? ''
+      checks.push({
+        id: 'css-var',
+        passed: /--[a-zA-Z][\w-]*\s*:/i.test(sheet),
+        message: 'Define a CSS variable',
+      })
+      checks.push({
+        id: 'css-var-use',
+        passed: /var\s*\(\s*--/i.test(sheet),
+        message: 'Use var(--...)',
+      })
+      checks.push({
+        id: 'keyframes',
+        passed: /@keyframes\s+[\w-]+\s*\{/i.test(sheet),
+        message: '@keyframes present',
+      })
+      checks.push({
+        id: 'animation',
+        passed: /animation(-name)?\s*:/i.test(sheet),
+        message: 'animation applied',
+      })
+      checks.push({
+        id: 'tile-transition',
+        passed: /transition\s*:/i.test(sheet) || /:\s*hover\s*\{[^}]*transform\s*:/i.test(sheet),
+        message: 'transition or transform hover',
+      })
+      checks.push({
+        id: 'responsive',
+        passed:
+          /@media\s*\(/i.test(sheet) ||
+          /repeat\s*\(\s*auto-fit\s*,\s*minmax\s*\(/i.test(sheet),
+        message: '@media OR auto-fit/minmax grid',
       })
       break
     }

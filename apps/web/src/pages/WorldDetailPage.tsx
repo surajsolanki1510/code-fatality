@@ -24,8 +24,7 @@ export function WorldDetailPage() {
   const world = WORLDS.find((w) => w.id === worldId)
   const progress = worldId ? getChapterProgress(worldId, completed) : null
   const showTiers = worldId === 'html-village' || worldId === 'css-forest'
-  const tiers: SkillTier[] =
-    worldId === 'css-forest' ? ['beginner', 'intermediate'] : ALL_TIERS
+  const tiers: SkillTier[] = ALL_TIERS
 
   if (!world || !worldId) {
     return (
