@@ -29,7 +29,7 @@ export const WORLDS: WorldDef[] = [
     name: 'CSS Forest',
     subtitle: 'REALM II — STYLE',
     description:
-      'PORTFOLIO FORGE — build YOUR portfolio site level by level. 40 chapters. Upload your photo. Launch a real site.',
+      'PORTFOLIO FORGE — build YOUR unique site + Froggy-style CSS labs (flex, grid, motion, responsive). Download + host on GitHub at the end.',
     bannerClass: 'world-card__banner--css',
     art: '/art/world-css.jpg',
     accent: '#5dff9f',

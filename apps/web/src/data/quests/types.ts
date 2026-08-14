@@ -1,4 +1,4 @@
-export type QuestKind = 'tutorial' | 'quest' | 'boss'
+export type QuestKind = 'tutorial' | 'quest' | 'boss' | 'lab'
 export type SkillTier = 'beginner' | 'intermediate' | 'expert'
 
 export type TagAttribute = {

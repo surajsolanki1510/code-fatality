@@ -1,12 +1,15 @@
 import Editor from '@monaco-editor/react'
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LearnPanel } from '../components/LearnPanel'
 import { ArenaButton, QuestNav } from '../components/QuestNav'
 import { FatalityArena, type LockOutcome } from '../components/quest-visuals/FatalityArena'
 import { LiveQuestArena } from '../components/quest-visuals/LiveQuestArena'
+import { CssLabArena } from '../components/quest-visuals/CssLabArena'
 import { PortfolioBuilderArena } from '../components/quest-visuals/PortfolioBuilderArena'
+import { CSS_LAB_BY_ID } from '../data/quests/cssLabs'
 import { continuePortfolioFiles } from '../data/quests/portfolioHtml'
+import { downloadPortfolioFiles, GITHUB_PAGES_STEPS } from '../lib/exportPortfolio'
 import { injectPortfolioHtml, usePortfolioStore } from '../store/portfolioStore'
 import { BRAND } from '../config/brand'
 import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests'
@@ -58,15 +61,20 @@ export function QuestPage() {
     if (!quest) return
     if (quest.worldId === 'css-forest') {
       if (!hydrated) return
-      const { siteHtml, siteCss } = usePortfolioStore.getState()
-      const next = continuePortfolioFiles(
-        siteHtml ?? '',
-        siteCss ?? '',
-        quest.starterHtml,
-        quest.starterCss ?? '',
-      )
-      setHtml(next.html)
-      setCss(next.css)
+      if (quest.kind === 'lab') {
+        setHtml(quest.starterHtml)
+        setCss(quest.starterCss ?? '')
+      } else {
+        const { siteHtml, siteCss } = usePortfolioStore.getState()
+        const next = continuePortfolioFiles(
+          siteHtml ?? '',
+          siteCss ?? '',
+          quest.starterHtml,
+          quest.starterCss ?? '',
+        )
+        setHtml(next.html)
+        setCss(next.css)
+      }
     } else {
       setHtml(quest.starterHtml)
       setCss(quest.starterCss ?? '')
@@ -76,8 +84,8 @@ export function QuestPage() {
     setFailIndex(0)
     setShowVictory(false)
     setLockOutcome('idle')
-    setPhoneTab('learn')
-    setCodeLang(quest.worldId === 'css-forest' && quest.chapter > 1 ? 'css' : 'html')
+    setPhoneTab(quest.kind === 'lab' ? 'code' : 'learn')
+    setCodeLang(quest.kind === 'lab' || (quest.worldId === 'css-forest' && quest.chapter > 1) ? 'css' : 'html')
   }, [quest, hydrated])
 
   const name = usePortfolioStore((s) => s.name)
@@ -90,36 +98,39 @@ export function QuestPage() {
   )
 
   const isCssForest = quest?.worldId === 'css-forest'
+  const isCssLab = quest?.kind === 'lab'
 
   useEffect(() => {
-    if (!isCssForest || !hydrated) return
+    if (!isCssForest || !hydrated || isCssLab) return
     if (!html.trim() && !css.trim()) return
     usePortfolioStore.getState().saveSite(html, css)
-  }, [html, css, isCssForest, hydrated])
+  }, [html, css, isCssForest, hydrated, isCssLab])
 
   const portfolioHtml = useMemo(() => {
-    if (!isCssForest) return deferredHtml
+    if (!isCssForest || isCssLab) return deferredHtml
     return injectPortfolioHtml(deferredHtml, portfolioProfile)
-  }, [deferredHtml, isCssForest, portfolioProfile])
+  }, [deferredHtml, isCssForest, isCssLab, portfolioProfile])
 
   const liveCheck = useMemo(() => {
     if (!quest) return null
+    if (isCssLab) return validateQuest(quest.id, deferredHtml, deferredCss)
     if (isCssForest) return validateQuest(quest.id, portfolioHtml, deferredCss)
     return validateQuest(
       quest.id,
       deferredHtml,
       quest.starterCss !== undefined ? deferredCss : undefined,
     )
-  }, [quest, portfolioHtml, deferredHtml, deferredCss, isCssForest])
+  }, [quest, portfolioHtml, deferredHtml, deferredCss, isCssForest, isCssLab])
 
   const previewSrcDoc = useMemo(() => {
-    if (!quest) return ''
+    if (!quest || isCssLab) return ''
     if (isCssForest) return buildPreviewDocument(portfolioHtml, deferredCss || undefined)
     const htmlSource = quest.starterCss !== undefined ? quest.starterHtml : deferredHtml
     const cssSource = quest.starterCss !== undefined ? deferredCss : deferredCss || undefined
     return buildPreviewDocument(htmlSource, cssSource)
-  }, [portfolioHtml, deferredHtml, deferredCss, quest, isCssForest])
+  }, [portfolioHtml, deferredHtml, deferredCss, quest, isCssForest, isCssLab])
 
+  const [codeFrac, setCodeFrac] = useState(1.2)
   const editorLanguage = quest?.starterCss !== undefined ? 'css' : 'html'
   const editorValue = editorLanguage === 'css' ? css : html
   const setEditorValue = editorLanguage === 'css' ? setCss : setHtml
@@ -168,9 +179,12 @@ export function QuestPage() {
 
   const runCheck = useCallback(() => {
     if (!quest) return
-    const outcome = isCssForest
-      ? validateQuest(quest.id, injectPortfolioHtml(html, portfolioProfile), css)
-      : validateQuest(quest.id, html, quest.starterCss !== undefined ? css : undefined)
+    const outcome =
+      quest.kind === 'lab'
+        ? validateQuest(quest.id, html, css)
+        : isCssForest
+          ? validateQuest(quest.id, injectPortfolioHtml(html, portfolioProfile), css)
+          : validateQuest(quest.id, html, quest.starterCss !== undefined ? css : undefined)
     if (outcome.passed) {
       if (!isQuestComplete(quest.id)) {
         completeQuest(quest.id, quest.xp, quest.badgeId)
@@ -187,7 +201,6 @@ export function QuestPage() {
       setFailIndex((i) => i + 1)
       const detail = failed.map((r) => r.message).join(' ')
       setFeedback({ type: 'fail', text: `${quip} ${detail}` })
-      // Allow another fail strike later
       window.setTimeout(() => setLockOutcome('idle'), 600)
     }
   }, [quest, html, css, completeQuest, isQuestComplete, failIndex, isCssForest, portfolioProfile])
@@ -235,17 +248,46 @@ export function QuestPage() {
       setLockOutcome('idle')
     }
 
-    const packLabel = quest.story[0]?.replace('Portfolio section: ', '') ?? 'CSS'
+    const packLabel = quest.story[0]?.replace('Portfolio section: ', '').replace('CSS Lab: ', '') ?? 'CSS'
     const lesson = quest.tagLessons[0]
+    const labMeta = isCssLab ? CSS_LAB_BY_ID[quest.id] : undefined
+    const isLaunch = quest.id === 'css-p-e-boss'
+    const showLaunch = isLaunch && (lockOutcome === 'win' || alreadyDone)
+
+    const onResizeStart = (e: ReactMouseEvent) => {
+      e.preventDefault()
+      const startY = e.clientY
+      const startFrac = codeFrac
+      const onMove = (ev: MouseEvent) => {
+        const dy = startY - ev.clientY
+        const next = Math.min(1.8, Math.max(0.7, startFrac + dy / 280))
+        setCodeFrac(next)
+      }
+      const onUp = () => {
+        window.removeEventListener('mousemove', onMove)
+        window.removeEventListener('mouseup', onUp)
+      }
+      window.addEventListener('mousemove', onMove)
+      window.addEventListener('mouseup', onUp)
+    }
 
     return (
-      <div className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}`}>
+      <div
+        className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}${isCssLab ? ' is-lab' : ''}`}
+        style={
+          {
+            '--pf-preview-fr': `${Math.max(0.55, 2.1 - codeFrac)}fr`,
+            '--pf-code-fr': `${codeFrac}fr`,
+          } as CSSProperties
+        }
+      >
         <header className="pf-game__nav">
           <Link to={`/world/${quest.worldId}`}>← Portfolio</Link>
-          <span className="pf-game__brand">PORTFOLIO FORGE</span>
+          <span className="pf-game__brand">{isCssLab ? 'CSS LAB' : 'PORTFOLIO FORGE'}</span>
           <span className="pf-game__chap">
             LVL {quest.chapter} · {packLabel}
             {quest.kind === 'boss' ? ' · BOSS' : ''}
+            {quest.kind === 'lab' ? ' · GAME' : ''}
           </span>
         </header>
 
@@ -254,7 +296,7 @@ export function QuestPage() {
             Learn
           </button>
           <button type="button" className={phoneTab === 'code' ? 'is-on' : ''} onClick={() => setPhoneTab('code')}>
-            Code
+            {isCssLab ? 'Play' : 'Code'}
             {passedCount > 0 && (
               <span className="fatality-phone-tabs__badge">
                 {passedCount}/{totalCount}
@@ -266,12 +308,12 @@ export function QuestPage() {
         <div className="pf-game__split">
           <aside className={`pf-lesson${phoneTab === 'learn' ? ' is-phone-on' : ''}`}>
             <div className="pf-lesson__scroll">
-              <span className="pf-lesson__pack">{packLabel} PACK · {quest.tier}</span>
+              <span className="pf-lesson__pack">{packLabel} · {quest.tier}</span>
               <h1 className="pf-lesson__title">{quest.title}</h1>
               <p className="pf-lesson__hook">{quest.hook}</p>
 
               <div className="pf-lesson__job">
-                <h2>Write this in your site</h2>
+                <h2>{isCssLab ? 'Clear this CSS game' : 'Write this in your site'}</h2>
                 <p>{quest.missionBrief}</p>
               </div>
 
@@ -303,48 +345,110 @@ export function QuestPage() {
                 })}
               </ul>
 
+              {showLaunch && (
+                <div className="pf-launch">
+                  <h3>Launch your portfolio</h3>
+                  <p>Download your code, then host it free on GitHub Pages.</p>
+                  <ol>
+                    {GITHUB_PAGES_STEPS.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                  <div className="pf-launch__btns">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const { siteHtml, siteCss } = usePortfolioStore.getState()
+                        downloadPortfolioFiles(siteHtml || html, siteCss || css, portfolioProfile)
+                      }}
+                    >
+                      Download HTML + CSS
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() => window.open('https://pages.github.com/', '_blank', 'noopener,noreferrer')}
+                    >
+                      GitHub Pages guide
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <button type="button" className="pf-lesson__cta" onClick={() => setPhoneTab('code')}>
-                Code your portfolio →
+                {isCssLab ? 'Open lab →' : 'Code your portfolio →'}
               </button>
             </div>
           </aside>
 
           <section className={`pf-stage${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <PortfolioBuilderArena previewSrcDoc={previewSrcDoc} />
+            {isCssLab ? (
+              <CssLabArena
+                quest={quest}
+                css={deferredCss}
+                checkResults={liveCheck?.results}
+                won={lockOutcome === 'win'}
+              />
+            ) : (
+              <PortfolioBuilderArena previewSrcDoc={previewSrcDoc} />
+            )}
           </section>
 
+          {!isPhone && (
+            <div
+              className="pf-split-handle"
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label="Resize code editor"
+              onMouseDown={onResizeStart}
+            />
+          )}
+
           <div className={`pf-code${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
-            <div className="pf-code__tabs" role="tablist">
-              <button
-                type="button"
-                data-lang="html"
-                className={codeLang === 'html' ? 'is-on' : ''}
-                onClick={() => setCodeLang('html')}
-              >
-                HTML
-              </button>
-              <button
-                type="button"
-                data-lang="css"
-                className={codeLang === 'css' ? 'is-on' : ''}
-                onClick={() => setCodeLang('css')}
-              >
-                CSS
-              </button>
-            </div>
+            {!isCssLab && (
+              <div className="pf-code__tabs" role="tablist">
+                <button
+                  type="button"
+                  data-lang="html"
+                  className={codeLang === 'html' ? 'is-on' : ''}
+                  onClick={() => setCodeLang('html')}
+                >
+                  HTML
+                </button>
+                <button
+                  type="button"
+                  data-lang="css"
+                  className={codeLang === 'css' ? 'is-on' : ''}
+                  onClick={() => setCodeLang('css')}
+                >
+                  CSS
+                </button>
+              </div>
+            )}
             <p className="pf-code__hint">
-              {codeLang === 'html'
-                ? 'This HTML is your portfolio page. Type your name, photo (src="{{PHOTO}}"), and sections here.'
-                : 'This CSS is your stylesheet. Every rule you write styles the page above — it stays for every level.'}
+              {isCssLab
+                ? labMeta
+                  ? `Write CSS for ${labMeta.board.target}. Visual board updates live — Froggy style.`
+                  : 'Write CSS for the lab board.'
+                : codeLang === 'html'
+                  ? 'This HTML is your portfolio page. Type your name, photo (src="{{PHOTO}}"), and sections here.'
+                  : 'This CSS is your stylesheet. Every rule you write styles the page above — it stays for every level.'}
             </p>
+            {isCssLab && labMeta && (labMeta.board.before || labMeta.board.after) && (
+              <pre className="pf-code__shell">
+                {labMeta.board.before ? `${labMeta.board.before}\n` : ''}
+                <span className="pf-code__shell-edit">/* your CSS below */</span>
+                {labMeta.board.after ? `\n${labMeta.board.after}` : ''}
+              </pre>
+            )}
             <div className="pf-code__editor">
               {isPhone ? (
                 <textarea
                   className="fatality-editor__textarea"
-                  value={codeLang === 'html' ? html : css}
+                  value={isCssLab || codeLang === 'css' ? css : html}
                   onChange={(e) => {
-                    if (codeLang === 'html') setHtml(e.target.value)
-                    else setCss(e.target.value)
+                    if (isCssLab || codeLang === 'css') setCss(e.target.value)
+                    else setHtml(e.target.value)
                     onCodeChange()
                   }}
                   spellCheck={false}
@@ -352,12 +456,12 @@ export function QuestPage() {
               ) : (
                 <Editor
                   height="100%"
-                  language={codeLang}
+                  language={isCssLab || codeLang === 'css' ? 'css' : 'html'}
                   theme="vs-dark"
-                  value={codeLang === 'html' ? html : css}
+                  value={isCssLab || codeLang === 'css' ? css : html}
                   onChange={(v) => {
-                    if (codeLang === 'html') setHtml(v ?? '')
-                    else setCss(v ?? '')
+                    if (isCssLab || codeLang === 'css') setCss(v ?? '')
+                    else setHtml(v ?? '')
                     onCodeChange()
                   }}
                   options={editorOptions}
@@ -365,22 +469,22 @@ export function QuestPage() {
               )}
             </div>
             <div className="pf-code__bar pf-code__bar--desktop">
-              <span>index.html / styles.css</span>
+              <span>{isCssLab ? 'lab.css' : 'index.html / styles.css'}</span>
               <button type="button" className="pf-code__btn pf-code__btn--ghost" onClick={showHint}>
                 Hint
               </button>
               <button type="button" className="pf-code__btn pf-code__btn--publish" onClick={runCheck}>
-                PUBLISH SECTION
+                {isCssLab ? 'CLEAR LAB' : 'PUBLISH SECTION'}
               </button>
               {feedback?.type === 'win' && nextQuest && (
                 <button type="button" className="pf-code__btn pf-code__btn--next" onClick={() => navigate(`/quest/${nextQuest.id}`)}>
-                  Next →
+                  {nextQuest.kind === 'lab' ? 'Next lab →' : nextQuest.kind === 'boss' ? 'Boss →' : 'Back to portfolio →'}
                 </button>
               )}
             </div>
             {feedback && (
               <p className={`pf-toast pf-toast--${feedback.type}`}>
-                {showVictory && !alreadyDone && <strong>SAVED · </strong>}
+                {showVictory && !alreadyDone && <strong>{isCssLab ? 'CLEARED · ' : 'SAVED · '}</strong>}
                 {feedback.text}
               </p>
             )}
@@ -392,7 +496,7 @@ export function QuestPage() {
             Hint
           </button>
           <button type="button" className="pf-code__btn pf-code__btn--publish" onClick={onPostGlow}>
-            PUBLISH SECTION
+            {isCssLab ? 'CLEAR LAB' : 'PUBLISH SECTION'}
           </button>
           {feedback?.type === 'win' && nextQuest && (
             <button type="button" className="pf-code__btn pf-code__btn--next" onClick={() => navigate(`/quest/${nextQuest.id}`)}>

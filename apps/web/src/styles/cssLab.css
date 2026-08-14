@@ -1,0 +1,180 @@
+/* Froggy-style CSS labs */
+.css-lab {
+  --lab-ink: #0f172a;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 107, 157, 0.35), transparent 45%),
+    radial-gradient(ellipse at 80% 90%, rgba(124, 107, 255, 0.3), transparent 40%),
+    linear-gradient(160deg, #1a2744 0%, #0f3d3a 55%, #1b2a1f 100%);
+  color: #f8fafc;
+}
+
+.css-lab--grid {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(74, 222, 128, 0.25), transparent 50%),
+    linear-gradient(160deg, #14532d 0%, #052e16 100%);
+}
+
+.css-lab--transition,
+.css-lab--animation {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 107, 157, 0.35), transparent 55%),
+    linear-gradient(160deg, #2e1065 0%, #0f172a 100%);
+}
+
+.css-lab--responsive {
+  background: linear-gradient(160deg, #0ea5e9 0%, #1e293b 60%);
+}
+
+.css-lab.is-won {
+  box-shadow: inset 0 0 0 3px rgba(74, 222, 128, 0.65);
+}
+
+.css-lab__hud {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.css-lab__mode {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.css-lab__hud strong {
+  font-size: 0.85rem;
+}
+
+.css-lab__badge {
+  margin-left: auto;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #86efac;
+}
+
+.css-lab__stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.css-lab__tip {
+  margin: 0;
+  font-size: 0.78rem;
+  opacity: 0.85;
+  line-height: 1.35;
+}
+
+.css-lab__checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.css-lab__checks li {
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.css-lab__checks li.is-done {
+  background: rgba(134, 239, 172, 0.25);
+  color: #bbf7d0;
+}
+
+.pf-launch {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(232, 93, 138, 0.12), rgba(91, 77, 255, 0.12));
+  border: 1px solid rgba(232, 93, 138, 0.25);
+}
+
+.pf-launch h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.pf-launch p {
+  margin: 0 0 0.55rem;
+  font-size: 0.82rem;
+  color: var(--pf-muted);
+  line-height: 1.4;
+}
+
+.pf-launch ol {
+  margin: 0 0 0.65rem;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--pf-ink);
+}
+
+.pf-launch__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.pf-launch__btns button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.75rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--pf-accent), #ff9ec0);
+  color: #fff;
+}
+
+.pf-launch__btns button.ghost {
+  background: #fff;
+  color: var(--pf-accent2);
+  border: 1px solid rgba(91, 77, 255, 0.3);
+}
+
+.pf-split-handle {
+  grid-column: 2;
+  grid-row: 2;
+  height: 8px;
+  margin-top: -4px;
+  cursor: row-resize;
+  position: relative;
+  z-index: 5;
+  background: transparent;
+}
+
+.pf-split-handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 48px;
+  height: 4px;
+  margin-left: -24px;
+  border-radius: 999px;
+  background: rgba(26, 18, 24, 0.25);
+}

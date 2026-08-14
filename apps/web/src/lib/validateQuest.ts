@@ -167,8 +167,12 @@ function sourceHasAttr(html: string, tag: string, attrName: string, attrValue?: 
 }
 
 import { validateCssPortfolio } from './validateCssPortfolio'
+import { validateCssLab } from '../data/quests/cssLabs'
 
 export function validateQuest(questId: string, html: string, css?: string): ValidationOutcome {
+  const labResult = validateCssLab(questId, css ?? '')
+  if (labResult) return labResult
+
   const portfolioResult = validateCssPortfolio(questId, html, css ?? '')
   if (portfolioResult) return portfolioResult
 

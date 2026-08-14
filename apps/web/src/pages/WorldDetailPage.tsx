@@ -140,8 +140,8 @@ function QuestRows({
               <span className="chapter-row__num">Ch. {q.chapter}</span>
               {q.title}
             </span>
-            <span className={`quest-row__badge${q.kind === 'boss' ? ' quest-row__badge--boss' : ''}`}>
-              {!open ? 'LOCKED' : done ? 'DONE' : q.kind === 'boss' ? 'BOSS' : 'START'}
+            <span className={`quest-row__badge${q.kind === 'boss' ? ' quest-row__badge--boss' : ''}${q.kind === 'lab' ? ' quest-row__badge--lab' : ''}`}>
+              {!open ? 'LOCKED' : done ? 'DONE' : q.kind === 'boss' ? 'BOSS' : q.kind === 'lab' ? 'LAB' : 'START'}
             </span>
           </li>
         )

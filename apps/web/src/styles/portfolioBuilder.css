@@ -75,8 +75,8 @@ body:has(.pf-game),
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(200px, 24%) 1fr;
-  grid-template-rows: minmax(0, 1fr) minmax(180px, 34%);
+  grid-template-columns: minmax(200px, 22%) 1fr;
+  grid-template-rows: minmax(120px, var(--pf-preview-fr, 0.85fr)) 10px minmax(240px, var(--pf-code-fr, 1.15fr));
   overflow: hidden;
 }
 
@@ -218,7 +218,7 @@ body:has(.pf-game),
 
 .pf-code {
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 3;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -265,6 +265,23 @@ body:has(.pf-game),
   font-size: 0.68rem;
   color: #8a7a82;
   background: #1a1218;
+}
+
+.pf-code__shell {
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: #7dffc8;
+  background: #120e14;
+  border-bottom: 1px solid #2a2030;
+  white-space: pre-wrap;
+  max-height: 4.5rem;
+  overflow: auto;
+}
+
+.pf-code__shell-edit {
+  color: #ff8fb5;
 }
 
 .pf-code__editor {
@@ -425,6 +442,10 @@ body:has(.pf-game),
   .pf-game__split {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
+  }
+
+  .pf-split-handle {
+    display: none;
   }
 
   .pf-lesson,

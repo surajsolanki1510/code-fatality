@@ -57,6 +57,9 @@ export function isQuestUnlocked(quest: QuestDef, completedIds: string[]): boolea
   const siblings = getQuestsForWorld(quest.worldId)
   const index = siblings.findIndex((q) => q.id === quest.id)
   if (index <= 0) return true
+  if (completedIds.includes(quest.id)) return true
+  // Curriculum inserts (labs) should not brick players who already cleared later levels
+  if (siblings.slice(index + 1).some((q) => completedIds.includes(q.id))) return true
   const prev = siblings[index - 1]
   return completedIds.includes(prev.id)
 }
