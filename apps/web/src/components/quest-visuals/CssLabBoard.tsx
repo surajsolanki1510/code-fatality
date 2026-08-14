@@ -12,49 +12,6 @@ type Props = {
 }
 
 const SLOT_W = 92
-const SLOT_GAP = 20
-
-function parseFlexLayout(css: string) {
-  const jc = css.match(/justify-content\s*:\s*([^;\s]+)/i)?.[1]?.toLowerCase() ?? 'flex-start'
-  const fd = css.match(/flex-direction\s*:\s*([^;\s]+)/i)?.[1]?.toLowerCase() ?? 'row'
-  const ai = css.match(/align-items\s*:\s*([^;\s]+)/i)?.[1]?.toLowerCase() ?? 'stretch'
-  return { jc, fd, ai }
-}
-
-function goalStyle(css: string, boardClass?: string): CSSProperties {
-  const { jc, fd } = parseFlexLayout(css)
-  const isCol = fd.includes('column')
-  const gap = SLOT_GAP
-
-  const base: CSSProperties = {
-    position: 'absolute',
-    display: 'flex',
-    flexDirection: isCol ? 'column' : 'row',
-    gap,
-    pointerEvents: 'none',
-    zIndex: 1,
-  }
-
-  const pad = 28
-
-  if (boardClass === 'is-end' || jc === 'flex-end') {
-    if (isCol) return { ...base, right: pad, top: pad, bottom: pad, justifyContent: 'flex-end' }
-    return { ...base, right: pad, bottom: pad }
-  }
-  if (boardClass === 'is-center' || jc === 'center') {
-    if (isCol) return { ...base, left: '50%', top: pad, bottom: pad, transform: 'translateX(-50%)', justifyContent: 'center' }
-    return { ...base, left: '50%', bottom: pad, transform: 'translateX(-50%)' }
-  }
-  if (boardClass === 'is-between' || jc === 'space-between') {
-    return { ...base, left: pad, right: pad, bottom: pad, justifyContent: 'space-between', width: `calc(100% - ${pad * 2}px)` }
-  }
-  if (boardClass === 'is-column' || isCol) {
-    return { ...base, left: '50%', bottom: pad, transform: 'translateX(-50%)', flexDirection: 'column' }
-  }
-  // flex-start default
-  if (isCol) return { ...base, left: '50%', top: pad, transform: 'translateX(-50%)', flexDirection: 'column' }
-  return { ...base, left: pad, bottom: pad }
-}
 
 function FrogSvg({ hue = '#5cd65c', landed, uid = '0' }: { hue?: string; landed?: boolean; uid?: string }) {
   return (
@@ -62,7 +19,7 @@ function FrogSvg({ hue = '#5cd65c', landed, uid = '0' }: { hue?: string; landed?
       className={`froggy-frog-svg${landed ? ' is-landed' : ''}`}
       viewBox="0 0 96 88"
       width={SLOT_W - 8}
-      height={78}
+      height={72}
       aria-hidden
     >
       <defs>
@@ -94,27 +51,26 @@ function FrogSvg({ hue = '#5cd65c', landed, uid = '0' }: { hue?: string; landed?
   )
 }
 
-function LilySvg({ glowing }: { glowing?: boolean }) {
+function LilySvg({ glowing, uid = '0' }: { glowing?: boolean; uid?: string }) {
   return (
     <svg
       viewBox="0 0 100 44"
       width={SLOT_W}
-      height={40}
+      height={38}
       aria-hidden
       className={`froggy-lily-svg${glowing ? ' is-glow' : ''}`}
     >
       <defs>
-        <radialGradient id="lilyGrad" cx="50%" cy="40%">
+        <radialGradient id={`lilyGrad-${uid}`} cx="50%" cy="40%">
           <stop offset="0%" stopColor="#7ee87e" />
           <stop offset="100%" stopColor="#2d7a2d" />
         </radialGradient>
       </defs>
       <ellipse cx="50" cy="38" rx="44" ry="10" fill="rgba(0,0,0,0.2)" />
-      <ellipse cx="50" cy="28" rx="46" ry="15" fill="url(#lilyGrad)" />
+      <ellipse cx="50" cy="28" rx="46" ry="15" fill={`url(#lilyGrad-${uid})`} />
       <ellipse cx="50" cy="26" rx="38" ry="11" fill="#6dd66d" />
       <path d="M50 10 L56 24 L44 24 Z" fill="#5ecf5e" />
       <path d="M50 10 L54 20 L46 20 Z" fill="#8ef08e" opacity="0.6" />
-      <ellipse cx="50" cy="26" rx="6" ry="3" fill="#4a9e4a" opacity="0.4" />
     </svg>
   )
 }
@@ -131,7 +87,7 @@ function PondDecor() {
   )
 }
 
-/** Right-side game board — premium pond with frogs that land on lily pads */
+/** Each flex item = frog on its own lily pad — always moves together */
 export function CssLabBoard({ quest, css, checkResults, won }: Props) {
   const lab = CSS_LAB_BY_ID[quest.id]
   const [phoneW, setPhoneW] = useState(100)
@@ -148,8 +104,6 @@ export function CssLabBoard({ quest, css, checkResults, won }: Props) {
     [board, css],
   )
 
-  const goalsPos = useMemo(() => goalStyle(css, board.boardClass), [css, board.boardClass])
-
   return (
     <div className={`froggy-board froggy-board--${board.mode}${won ? ' is-won' : ''}${allPassed ? ' is-solved' : ''}`}>
       <style>{`
@@ -161,26 +115,42 @@ export function CssLabBoard({ quest, css, checkResults, won }: Props) {
         .froggy-board--flex .lab-target {
           width: 100%;
           min-height: 260px;
-          align-items: flex-end;
-          gap: ${SLOT_GAP}px;
+          gap: 1rem;
           padding: 1.75rem;
         }
-        .froggy-board--flex .froggy-frog-wrap {
+        /* One slot = lily pad + frog — flex moves the whole unit */
+        .froggy-board--flex .froggy-slot {
           flex-shrink: 0;
           width: ${SLOT_W}px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          min-height: 110px;
           transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-          z-index: 3;
         }
-        .froggy-board--flex.is-solved .froggy-frog-wrap {
+        .froggy-board--flex .froggy-slot__frog {
+          margin-bottom: -6px;
+          z-index: 2;
+          line-height: 0;
+        }
+        .froggy-board--flex .froggy-slot__pad {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          z-index: 1;
+        }
+        .froggy-board--flex .froggy-slot__label {
+          font-size: 0.65rem;
+          font-weight: 800;
+          color: rgba(255, 255, 255, 0.5);
+          letter-spacing: 0.06em;
+          margin-top: 0.1rem;
+        }
+        .froggy-board--flex.is-solved .froggy-slot {
           animation: froggy-hop 0.6s ease;
         }
-        .froggy-board--flex.is-solved .froggy-frog-wrap .froggy-frog-svg {
-          transform: translateY(6px);
+        .froggy-board--flex.is-solved .froggy-slot .froggy-frog-svg {
+          transform: translateY(4px);
         }
         .froggy-board--grid .lab-target {
           width: 100%;
@@ -250,18 +220,15 @@ export function CssLabBoard({ quest, css, checkResults, won }: Props) {
           <PondDecor />
           <div className="froggy-pond-wrap">
             <div id={id} className="lab-target froggy-pond">
-              {/* Goal lily pads — positioned to match where flex will place frogs */}
-              <div className="froggy-goals" style={goalsPos} aria-hidden>
-                {board.pieces.map((p) => (
-                  <div key={`goal-${p.id}`} className="froggy-goal" style={{ width: SLOT_W }}>
-                    <LilySvg glowing={allPassed} />
-                    <span className="froggy-goal__label">{p.label}</span>
-                  </div>
-                ))}
-              </div>
               {board.pieces.map((p) => (
-                <div key={p.id} className="froggy-frog-wrap" title={`Frog ${p.label}`}>
-                  <FrogSvg hue={p.hue} landed={allPassed} uid={p.id} />
+                <div key={p.id} className="froggy-slot" title={`Frog ${p.label}`}>
+                  <div className="froggy-slot__frog">
+                    <FrogSvg hue={p.hue} landed={allPassed} uid={p.id} />
+                  </div>
+                  <div className="froggy-slot__pad">
+                    <LilySvg glowing={allPassed} uid={p.id} />
+                    <span className="froggy-slot__label">{p.label}</span>
+                  </div>
                 </div>
               ))}
             </div>
