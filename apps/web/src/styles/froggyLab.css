@@ -1,4 +1,4 @@
-/* ═══ Flexbox Froggy-style lab UI — calm green + teal pond ═══ */
+/* ═══ FLEX POND — premium Froggy+ lab UI ═══ */
 
 .froggy-game {
   position: fixed;
@@ -40,15 +40,17 @@ body:has(.froggy-game) {
   }
 }
 
-/* ── Left: green instruction panel (like Flexbox Froggy) ── */
+/* ── Left: premium green panel ── */
 .froggy-panel {
-  background: linear-gradient(180deg, #8fd053 0%, #7cb342 100%);
+  background:
+    radial-gradient(ellipse 120% 80% at 0% 0%, rgba(255, 255, 255, 0.18) 0%, transparent 55%),
+    linear-gradient(175deg, #9be062 0%, #7cb342 45%, #689f38 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 6px 0 32px rgba(0, 0, 0, 0.18);
 }
 
 .froggy-panel__head {
@@ -126,11 +128,14 @@ body:has(.froggy-game) {
 
 /* Froggy code box */
 .froggy-editor {
-  background: #e8e8e8;
-  border-radius: 8px;
+  background: linear-gradient(180deg, #f0f0f0 0%, #e4e4e4 100%);
+  border-radius: 12px;
   overflow: hidden;
   margin-bottom: 1rem;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .froggy-editor__chrome {
@@ -238,14 +243,20 @@ body:has(.froggy-game) {
 
 .froggy-actions__next {
   border: none;
-  border-radius: 6px;
-  padding: 0.55rem 1.35rem;
-  background: linear-gradient(180deg, #e84855 0%, #c62828 100%);
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(180deg, #ff5a67 0%, #d32f2f 100%);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 3px 0 #8b1a1a;
+  box-shadow: 0 4px 0 #8b1a1a, 0 8px 20px rgba(211, 47, 47, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.froggy-actions__next:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #8b1a1a, 0 10px 24px rgba(211, 47, 47, 0.45);
 }
 
 .froggy-actions__next:active {
@@ -253,12 +264,191 @@ body:has(.froggy-game) {
   box-shadow: 0 1px 0 #8b1a1a;
 }
 
-/* ── Right: teal pond board ── */
+/* ── Right: premium pond board ── */
 .froggy-board-pane {
   min-height: 0;
-  background: #1a6363;
+  background: #0d4a4a;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.froggy-board--flex {
+  background: linear-gradient(180deg, #1a8a8a 0%, #0f5555 55%, #0a3d3d 100%);
+}
+
+.froggy-pond-scene {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient pond layers */
+.froggy-pond-scene__sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(135, 206, 235, 0.25) 0%, transparent 35%);
+  pointer-events: none;
+}
+
+.froggy-pond-scene__water {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(100, 220, 220, 0.08) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+.froggy-pond-scene__ripples {
+  position: absolute;
+  inset: 0;
+  background: repeating-radial-gradient(
+    circle at 30% 70%,
+    transparent 0,
+    transparent 18px,
+    rgba(255, 255, 255, 0.03) 19px,
+    transparent 20px
+  );
+  animation: water-drift 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes water-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(12px, -6px) scale(1.02); }
+}
+
+.froggy-pond-scene__reeds {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background:
+    linear-gradient(90deg, transparent 8%, rgba(45, 106, 45, 0.5) 12%, transparent 14%),
+    linear-gradient(90deg, transparent 22%, rgba(55, 120, 55, 0.45) 25%, transparent 27%),
+    linear-gradient(90deg, transparent 88%, rgba(45, 106, 45, 0.5) 91%, transparent 93%),
+    linear-gradient(180deg, transparent 0%, rgba(20, 60, 40, 0.35) 100%);
+  pointer-events: none;
+}
+
+.froggy-pond-scene__fireflies {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255, 255, 180, 0.9) 0, transparent 3px),
+    radial-gradient(circle at 85% 35%, rgba(255, 255, 200, 0.7) 0, transparent 2px),
+    radial-gradient(circle at 70% 75%, rgba(200, 255, 200, 0.6) 0, transparent 2px);
+  animation: firefly-blink 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes firefly-blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.froggy-pond-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  z-index: 2;
+}
+
+.froggy-pond {
+  width: 100%;
+  min-height: 280px;
+  padding: 1.75rem;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.15) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 0 60px rgba(0, 80, 80, 0.35),
+    0 16px 48px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+}
+
+/* Goal lily pads inside pond */
+.froggy-goals {
+  opacity: 0.92;
+  transition: opacity 0.4s, filter 0.4s;
+}
+
+.froggy-board.is-solved .froggy-goals {
+  opacity: 1;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 160, 0.7));
+}
+
+.froggy-goal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.froggy-goal__label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.froggy-lily-svg {
+  transition: filter 0.4s, transform 0.4s;
+}
+
+.froggy-lily-svg.is-glow {
+  filter: drop-shadow(0 0 14px rgba(180, 255, 120, 1));
+  animation: lily-glow 1.2s ease-in-out infinite;
+}
+
+@keyframes lily-glow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(180, 255, 120, 0.8)); }
+  50% { transform: scale(1.04); filter: drop-shadow(0 0 22px rgba(220, 255, 160, 1)); }
+}
+
+.froggy-frog-svg {
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+}
+
+.froggy-frog-svg.is-landed {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Win sparkles */
+.froggy-pond-scene__sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.froggy-sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff9c4;
+  box-shadow: 0 0 12px #ffeb3b;
+  animation: sparkle-pop 1.2s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.08s);
+  left: calc(20% + var(--i) * 6%);
+  top: calc(30% + (var(--i) % 4) * 12%);
+  opacity: 0;
+}
+
+@keyframes sparkle-pop {
+  0% { opacity: 0; transform: scale(0) translateY(0); }
+  30% { opacity: 1; transform: scale(1.2) translateY(-8px); }
+  100% { opacity: 0; transform: scale(0.5) translateY(-40px); }
 }
 
 .froggy-board {
@@ -267,10 +457,6 @@ body:has(.froggy-game) {
   position: relative;
   display: flex;
   flex-direction: column;
-}
-
-.froggy-board--flex {
-  background: linear-gradient(180deg, #1d7373 0%, #145252 100%);
 }
 
 .froggy-board--grid {
@@ -287,56 +473,6 @@ body:has(.froggy-game) {
 
 .froggy-board--responsive {
   background: linear-gradient(160deg, #0c4a6e 0%, #1e293b 100%);
-}
-
-.froggy-pond-scene {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  position: relative;
-}
-
-.froggy-pond-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 920px;
-  min-height: 240px;
-  display: flex;
-  align-items: center;
-}
-
-.froggy-pond {
-  width: 100%;
-  min-height: 220px;
-  padding: 1.5rem 7rem 1.5rem 1.5rem;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.12);
-  border: 2px dashed rgba(255, 255, 255, 0.15);
-}
-
-.froggy-lilies {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  pointer-events: none;
-  opacity: 0.85;
-  transition: opacity 0.3s, filter 0.3s;
-}
-
-.froggy-lilies.is-glow {
-  opacity: 1;
-  filter: drop-shadow(0 0 12px rgba(255, 255, 200, 0.8));
-  animation: lily-pulse 1.5s ease infinite;
-}
-
-@keyframes lily-pulse {
-  50% { filter: drop-shadow(0 0 20px rgba(255, 255, 180, 1)); }
 }
 
 .froggy-garden-scene,
@@ -390,14 +526,22 @@ body:has(.froggy-game) {
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.65rem 1.5rem;
-  background: rgba(255, 255, 255, 0.95);
-  color: #1a6363;
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, #fff 0%, #e8f5e9 100%);
+  color: #1b5e20;
+  font-size: 1.35rem;
   font-weight: 800;
   border-radius: 999px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 255, 255, 0.5);
   animation: froggy-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.froggy-board__win-emoji {
+  font-size: 1.5rem;
+  animation: froggy-hop 0.6s ease infinite;
 }
 
 @keyframes froggy-pop {
