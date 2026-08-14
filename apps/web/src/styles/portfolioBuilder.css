@@ -42,6 +42,18 @@ body:has(.pf-game),
   backdrop-filter: blur(10px);
 }
 
+.pf-game__nav .pf-game__chap {
+  margin-left: auto;
+}
+
+.pf-game__nav .pf-focus-btn {
+  margin-left: auto;
+}
+
+.pf-game__nav .pf-focus-btn + .pf-game__chap {
+  margin-left: 0;
+}
+
 .pf-game__nav a {
   color: var(--pf-muted);
   text-decoration: none;
@@ -59,7 +71,6 @@ body:has(.pf-game),
 }
 
 .pf-game__chap {
-  margin-left: auto;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -75,9 +86,67 @@ body:has(.pf-game),
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(200px, 22%) 1fr;
-  grid-template-rows: minmax(120px, var(--pf-preview-fr, 0.85fr)) 10px minmax(240px, var(--pf-code-fr, 1.15fr));
+  grid-template-columns: minmax(180px, 18%) minmax(0, var(--pf-code-col, 1fr)) 8px minmax(0, var(--pf-preview-col, 1fr));
+  grid-template-rows: 1fr;
   overflow: hidden;
+}
+
+.pf-game:not(.is-lab) .pf-lesson {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.pf-game:not(.is-lab) .pf-code {
+  grid-column: 2;
+  grid-row: 1;
+  border-top: none;
+}
+
+.pf-game:not(.is-lab) .pf-split-handle--col-preview {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.pf-game:not(.is-lab) .pf-stage {
+  grid-column: 4;
+  grid-row: 1;
+  padding: 0;
+}
+
+.pf-game:not(.is-lab) .pf-split-handle--row,
+.pf-game:not(.is-lab) .pf-split-handle--col {
+  display: none;
+}
+
+.pf-game.is-lab .pf-game__split {
+  grid-template-columns: minmax(160px, 20%) 1fr;
+  grid-template-rows: minmax(0, var(--pf-lab-board-fr, 1.1fr)) 8px minmax(220px, var(--pf-lab-editor-fr, 0.9fr));
+}
+
+.pf-game.is-lab .pf-lesson {
+  grid-column: 1;
+  grid-row: 1 / 4;
+}
+
+.pf-game.is-lab .pf-stage {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.pf-game.is-lab .pf-split-handle--row {
+  grid-column: 2;
+  grid-row: 2;
+  display: block;
+}
+
+.pf-game.is-lab .pf-code {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.pf-game.is-lab .pf-split-handle--col,
+.pf-game.is-lab .pf-split-handle--col-preview {
+  display: none;
 }
 
 /* Lesson — light & calm */
@@ -209,21 +278,117 @@ body:has(.pf-game),
 
 /* Builder stage */
 .pf-stage {
-  grid-column: 2;
-  grid-row: 1;
   min-height: 0;
   overflow: hidden;
   padding: 0;
 }
 
-.pf-code {
+.pf-split-handle {
+  position: relative;
+  z-index: 5;
+  background: transparent;
+}
+
+.pf-split-handle--row {
+  height: 8px;
+  cursor: row-resize;
+}
+
+.pf-split-handle--row::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 48px;
+  height: 4px;
+  margin-left: -24px;
+  border-radius: 999px;
+  background: rgba(26, 18, 24, 0.25);
+}
+
+.pf-split-handle--col,
+.pf-split-handle--col-preview {
+  width: 8px;
+  cursor: col-resize;
+}
+
+.pf-split-handle--col::after,
+.pf-split-handle--col-preview::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 4px;
+  height: 48px;
+  margin-top: -24px;
+  border-radius: 999px;
+  background: rgba(26, 18, 24, 0.25);
+}
+
+.pf-focus-btn {
+  border: 1px solid var(--pf-line);
+  border-radius: 8px;
+  padding: 0.25rem 0.55rem;
+  background: #fff;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  color: var(--pf-muted);
+}
+
+.pf-focus-btn.is-on {
+  border-color: var(--pf-accent);
+  color: var(--pf-accent);
+}
+
+.pf-unlock-banner {
+  flex-shrink: 0;
+  padding: 0.25rem 0.9rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+  background: rgba(251, 191, 36, 0.2);
+  color: #92400e;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+.pf-game.is-focus .pf-lesson {
+  display: none;
+}
+
+.pf-game.is-focus:not(.is-lab) .pf-game__split {
+  grid-template-columns: minmax(0, var(--pf-code-col, 1fr)) 8px minmax(0, var(--pf-preview-col, 1fr));
+}
+
+.pf-game.is-focus:not(.is-lab) .pf-code {
+  grid-column: 1;
+}
+
+.pf-game.is-focus:not(.is-lab) .pf-split-handle--col-preview {
   grid-column: 2;
-  grid-row: 3;
+}
+
+.pf-game.is-focus:not(.is-lab) .pf-stage {
+  grid-column: 3;
+}
+
+.pf-game.is-focus.is-lab .pf-game__split {
+  grid-template-columns: 1fr;
+}
+
+.pf-game.is-focus.is-lab .pf-lesson {
+  display: none;
+}
+
+.pf-code {
   min-height: 0;
   display: flex;
   flex-direction: column;
   background: #1a1218;
-  border-top: 1px solid var(--pf-line);
+  border-left: 1px solid var(--pf-line);
 }
 
 .pf-code__tabs {

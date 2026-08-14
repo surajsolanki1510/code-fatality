@@ -11,6 +11,7 @@ import { CSS_LAB_BY_ID } from '../data/quests/cssLabs'
 import { continuePortfolioFiles } from '../data/quests/portfolioHtml'
 import { downloadPortfolioFiles, GITHUB_PAGES_STEPS } from '../lib/exportPortfolio'
 import { injectPortfolioHtml, usePortfolioStore } from '../store/portfolioStore'
+import { UNLOCK_ALL_QUESTS } from '../config/gameFlags'
 import { BRAND } from '../config/brand'
 import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests'
 import { buildPreviewDocument, validateQuest } from '../lib/validateQuest'
@@ -130,7 +131,9 @@ export function QuestPage() {
     return buildPreviewDocument(htmlSource, cssSource)
   }, [portfolioHtml, deferredHtml, deferredCss, quest, isCssForest, isCssLab])
 
-  const [codeFrac, setCodeFrac] = useState(1.2)
+  const [colSplit, setColSplit] = useState(0.48)
+  const [labRowSplit, setLabRowSplit] = useState(0.42)
+  const [focusMode, setFocusMode] = useState(false)
   const editorLanguage = quest?.starterCss !== undefined ? 'css' : 'html'
   const editorValue = editorLanguage === 'css' ? css : html
   const setEditorValue = editorLanguage === 'css' ? setCss : setHtml
@@ -248,20 +251,23 @@ export function QuestPage() {
       setLockOutcome('idle')
     }
 
-    const packLabel = quest.story[0]?.replace('Portfolio section: ', '').replace('CSS Lab: ', '') ?? 'CSS'
-    const lesson = quest.tagLessons[0]
     const labMeta = isCssLab ? CSS_LAB_BY_ID[quest.id] : undefined
+    const packLabel =
+      (isCssLab && labMeta?.gameTitle) ||
+      quest.story[0]?.replace('Portfolio section: ', '') ||
+      'CSS'
+    const lesson = quest.tagLessons[0]
     const isLaunch = quest.id === 'css-p-e-boss'
     const showLaunch = isLaunch && (lockOutcome === 'win' || alreadyDone)
 
-    const onResizeStart = (e: ReactMouseEvent) => {
+    const onColResizeStart = (e: ReactMouseEvent) => {
       e.preventDefault()
-      const startY = e.clientY
-      const startFrac = codeFrac
+      const startX = e.clientX
+      const start = colSplit
       const onMove = (ev: MouseEvent) => {
-        const dy = startY - ev.clientY
-        const next = Math.min(1.8, Math.max(0.7, startFrac + dy / 280))
-        setCodeFrac(next)
+        const dx = ev.clientX - startX
+        const next = Math.min(0.72, Math.max(0.28, start + dx / 900))
+        setColSplit(next)
       }
       const onUp = () => {
         window.removeEventListener('mousemove', onMove)
@@ -271,21 +277,53 @@ export function QuestPage() {
       window.addEventListener('mouseup', onUp)
     }
 
+    const onLabRowResizeStart = (e: ReactMouseEvent) => {
+      e.preventDefault()
+      const startY = e.clientY
+      const start = labRowSplit
+      const onMove = (ev: MouseEvent) => {
+        const dy = startY - ev.clientY
+        const next = Math.min(0.55, Math.max(0.3, start + dy / 500))
+        setLabRowSplit(next)
+      }
+      const onUp = () => {
+        window.removeEventListener('mousemove', onMove)
+        window.removeEventListener('mouseup', onUp)
+      }
+      window.addEventListener('mousemove', onMove)
+      window.addEventListener('mouseup', onUp)
+    }
+
+    const splitStyle: CSSProperties = isCssLab
+      ? ({
+          '--pf-lab-editor-fr': `${labRowSplit}fr`,
+          '--pf-lab-board-fr': `${Math.max(0.45, 1.05 - labRowSplit)}fr`,
+        } as CSSProperties)
+      : ({
+          '--pf-code-col': `${colSplit}fr`,
+          '--pf-preview-col': `${1 - colSplit}fr`,
+        } as CSSProperties)
+
     return (
       <div
-        className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}${isCssLab ? ' is-lab' : ''}`}
-        style={
-          {
-            '--pf-preview-fr': `${Math.max(0.55, 2.1 - codeFrac)}fr`,
-            '--pf-code-fr': `${codeFrac}fr`,
-          } as CSSProperties
-        }
+        className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}${isCssLab ? ' is-lab' : ''}${focusMode ? ' is-focus' : ''}`}
+        style={splitStyle}
       >
+        {UNLOCK_ALL_QUESTS && (
+          <p className="pf-unlock-banner">TEST MODE — all levels unlocked</p>
+        )}
         <header className="pf-game__nav">
           <Link to={`/world/${quest.worldId}`}>← Portfolio</Link>
-          <span className="pf-game__brand">{isCssLab ? 'CSS LAB' : 'PORTFOLIO FORGE'}</span>
+          <span className="pf-game__brand">{isCssLab ? labMeta?.gameTitle ?? 'CSS LAB' : 'PORTFOLIO FORGE'}</span>
+          <button
+            type="button"
+            className={`pf-focus-btn${focusMode ? ' is-on' : ''}`}
+            onClick={() => setFocusMode((f) => !f)}
+          >
+            {focusMode ? 'Show lesson' : 'Focus code'}
+          </button>
           <span className="pf-game__chap">
-            LVL {quest.chapter} · {packLabel}
+            LVL {quest.chapter} · {isCssLab ? quest.title : packLabel}
             {quest.kind === 'boss' ? ' · BOSS' : ''}
             {quest.kind === 'lab' ? ' · GAME' : ''}
           </span>
@@ -394,13 +432,23 @@ export function QuestPage() {
             )}
           </section>
 
-          {!isPhone && (
+          {!isPhone && !isCssLab && (
             <div
-              className="pf-split-handle"
+              className="pf-split-handle pf-split-handle--col-preview"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize code and preview"
+              onMouseDown={onColResizeStart}
+            />
+          )}
+
+          {!isPhone && isCssLab && (
+            <div
+              className="pf-split-handle pf-split-handle--row"
               role="separator"
               aria-orientation="horizontal"
-              aria-label="Resize code editor"
-              onMouseDown={onResizeStart}
+              aria-label="Resize game board and editor"
+              onMouseDown={onLabRowResizeStart}
             />
           )}
 

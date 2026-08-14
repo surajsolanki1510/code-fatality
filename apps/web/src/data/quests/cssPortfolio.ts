@@ -8,7 +8,7 @@ import {
   P_WITH_PROJECTS,
   P_WITH_SKILLS,
 } from './portfolioHtml'
-import { getLabAfterMap, labToQuest } from './cssLabs'
+import { getLabBeforeMap, labToQuest } from './cssLabs'
 
 type Learn = { tag: string; plain: string; example: string }
 
@@ -836,19 +836,17 @@ const SPECS: Spec[] = [
 
 export const CSS_PORTFOLIO_ONLY: QuestDef[] = SPECS.map(q)
 
-/** Portfolio levels + Froggy-style labs woven after matching chapters, then renumbered. */
+/** Labs teach first (Froggy-style), then portfolio level applies the skill. */
 export function weaveCssCourse(portfolio: QuestDef[]): QuestDef[] {
-  const afterMap = getLabAfterMap()
+  const beforeMap = getLabBeforeMap()
   const out: QuestDef[] = []
 
-  function pushWithLabs(quest: QuestDef) {
-    out.push(quest)
-    for (const lab of afterMap[quest.id] ?? []) {
-      pushWithLabs(labToQuest(lab))
+  for (const quest of portfolio) {
+    for (const lab of beforeMap[quest.id] ?? []) {
+      out.push(labToQuest(lab))
     }
+    out.push(quest)
   }
-
-  for (const quest of portfolio) pushWithLabs(quest)
   return out.map((quest, i) => ({ ...quest, chapter: i + 1 }))
 }
 

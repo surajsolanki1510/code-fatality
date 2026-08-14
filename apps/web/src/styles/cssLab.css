@@ -1,66 +1,147 @@
-/* Froggy-style CSS labs */
+/* Froggy-style CSS labs — see CssLabArena + QuestPage .pf-game.is-lab */
 .css-lab {
-  --lab-ink: #0f172a;
+  --lab-glow: #ff6b9d;
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.65rem;
-  border-radius: 0;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  position: relative;
+  overflow: hidden;
   background:
-    radial-gradient(ellipse at 20% 10%, rgba(255, 107, 157, 0.35), transparent 45%),
-    radial-gradient(ellipse at 80% 90%, rgba(124, 107, 255, 0.3), transparent 40%),
-    linear-gradient(160deg, #1a2744 0%, #0f3d3a 55%, #1b2a1f 100%);
+    radial-gradient(circle at 15% 20%, rgba(255, 107, 157, 0.45), transparent 42%),
+    radial-gradient(circle at 85% 75%, rgba(124, 107, 255, 0.4), transparent 40%),
+    linear-gradient(165deg, #0c1929 0%, #0f3d3a 45%, #1a2744 100%);
   color: #f8fafc;
 }
 
 .css-lab--grid {
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(74, 222, 128, 0.25), transparent 50%),
-    linear-gradient(160deg, #14532d 0%, #052e16 100%);
+    radial-gradient(circle at 20% 30%, rgba(74, 222, 128, 0.35), transparent 45%),
+    linear-gradient(165deg, #052e16 0%, #14532d 50%, #0c1929 100%);
+  --lab-glow: #4ade80;
 }
 
-.css-lab--transition,
+.css-lab--transition {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 107, 157, 0.5), transparent 50%),
+    linear-gradient(165deg, #2e1065 0%, #1e1b4b 50%, #0f172a 100%);
+  --lab-glow: #c084fc;
+}
+
 .css-lab--animation {
   background:
-    radial-gradient(circle at 50% 40%, rgba(255, 107, 157, 0.35), transparent 55%),
-    linear-gradient(160deg, #2e1065 0%, #0f172a 100%);
+    radial-gradient(circle at 50% 40%, rgba(251, 191, 36, 0.4), transparent 48%),
+    linear-gradient(165deg, #431407 0%, #2e1065 55%, #0f172a 100%);
+  --lab-glow: #fbbf24;
 }
 
 .css-lab--responsive {
-  background: linear-gradient(160deg, #0ea5e9 0%, #1e293b 60%);
+  background: linear-gradient(165deg, #0c4a6e 0%, #1e293b 55%, #0f172a 100%);
+  --lab-glow: #38bdf8;
 }
 
 .css-lab.is-won {
-  box-shadow: inset 0 0 0 3px rgba(74, 222, 128, 0.65);
+  box-shadow: inset 0 0 0 4px rgba(134, 239, 172, 0.7);
+  animation: lab-win-pulse 1.2s ease infinite;
 }
 
-.css-lab__hud {
+.css-lab.is-heating {
+  box-shadow: inset 0 0 0 2px rgba(255, 107, 157, 0.35);
+}
+
+@keyframes lab-win-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 4px rgba(134, 239, 172, 0.5); }
+  50% { box-shadow: inset 0 0 0 6px rgba(134, 239, 172, 0.9); }
+}
+
+.css-lab__hero {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  z-index: 3;
 }
 
-.css-lab__mode {
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.15);
+.css-lab__game-title {
+  margin: 0;
+  font-family: var(--font-display, Impact, sans-serif);
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  background: linear-gradient(90deg, var(--lab-glow), #fff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.css-lab__hud strong {
+.css-lab__level {
+  margin: 0.15rem 0 0;
   font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.9;
 }
 
-.css-lab__badge {
-  margin-left: auto;
-  font-style: normal;
+.css-lab__meter {
+  position: relative;
+  width: 88px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.css-lab__meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--lab-glow), #fff);
+  opacity: 0.85;
+  transition: width 0.35s ease;
+}
+
+.css-lab__meter span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-size: 0.65rem;
   font-weight: 900;
-  letter-spacing: 0.08em;
+}
+
+.css-lab__win-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-display, Impact, sans-serif);
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
   color: #86efac;
+  border: 3px solid #86efac;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.92);
+  pointer-events: none;
+}
+
+.css-lab__pads {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+  margin-bottom: -0.5rem;
+  z-index: 1;
+}
+
+.css-lab__pad {
+  width: 72px;
+  height: 28px;
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(ellipse at 50% 40%, #3dd6c6 0%, #1a7a52 70%, #0f5132 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0.85;
 }
 
 .css-lab__stage {
@@ -69,17 +150,73 @@
   display: flex;
   align-items: stretch;
   justify-content: center;
-  padding: 0.75rem;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.5rem;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: width 0.25s ease;
+  margin: 0 auto;
+  position: relative;
+}
+
+.css-lab__beat-bar {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  width: 120px;
+  height: 4px;
+  margin-left: -60px;
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.3);
+  animation: lab-beat 1s ease infinite;
+}
+
+@keyframes lab-beat {
+  0%, 100% { transform: scaleX(0.6); opacity: 0.4; }
+  50% { transform: scaleX(1); opacity: 1; }
+}
+
+.css-lab__shrink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.css-lab__shrink label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.css-lab__shrink input[type='range'] {
+  width: 100%;
+  accent-color: #38bdf8;
+}
+
+.css-lab__shrink span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .css-lab__tip {
   margin: 0;
-  font-size: 0.78rem;
-  opacity: 0.85;
+  font-size: 0.82rem;
+  font-weight: 700;
   line-height: 1.35;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
 }
 
 .css-lab__checks {
@@ -89,92 +226,21 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  flex-shrink: 0;
 }
 
 .css-lab__checks li {
-  padding: 0.25rem 0.55rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .css-lab__checks li.is-done {
-  background: rgba(134, 239, 172, 0.25);
+  background: rgba(134, 239, 172, 0.2);
+  border-color: rgba(134, 239, 172, 0.5);
   color: #bbf7d0;
-}
-
-.pf-launch {
-  margin-top: 0.75rem;
-  padding: 0.85rem;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(232, 93, 138, 0.12), rgba(91, 77, 255, 0.12));
-  border: 1px solid rgba(232, 93, 138, 0.25);
-}
-
-.pf-launch h3 {
-  margin: 0 0 0.35rem;
-  font-size: 0.95rem;
-}
-
-.pf-launch p {
-  margin: 0 0 0.55rem;
-  font-size: 0.82rem;
-  color: var(--pf-muted);
-  line-height: 1.4;
-}
-
-.pf-launch ol {
-  margin: 0 0 0.65rem;
-  padding-left: 1.1rem;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  color: var(--pf-ink);
-}
-
-.pf-launch__btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.pf-launch__btns button {
-  border: none;
-  border-radius: 8px;
-  padding: 0.45rem 0.75rem;
-  font-family: inherit;
-  font-weight: 800;
-  font-size: 0.75rem;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--pf-accent), #ff9ec0);
-  color: #fff;
-}
-
-.pf-launch__btns button.ghost {
-  background: #fff;
-  color: var(--pf-accent2);
-  border: 1px solid rgba(91, 77, 255, 0.3);
-}
-
-.pf-split-handle {
-  grid-column: 2;
-  grid-row: 2;
-  height: 8px;
-  margin-top: -4px;
-  cursor: row-resize;
-  position: relative;
-  z-index: 5;
-  background: transparent;
-}
-
-.pf-split-handle::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 2px;
-  width: 48px;
-  height: 4px;
-  margin-left: -24px;
-  border-radius: 999px;
-  background: rgba(26, 18, 24, 0.25);
+  box-shadow: 0 0 12px rgba(134, 239, 172, 0.35);
 }

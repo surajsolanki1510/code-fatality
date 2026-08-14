@@ -5,6 +5,7 @@ import { CSS_PORTFOLIO_QUESTS } from './cssPortfolio'
 import { storyBeatsFor } from './htmlStoryBeats'
 import { enrichTagLessons } from './tagGuide'
 import type { QuestDef, SkillTier } from './types'
+import { UNLOCK_ALL_QUESTS } from '../../config/gameFlags'
 
 function withStoryBeats(quests: QuestDef[]): QuestDef[] {
   return quests.map((q) => ({
@@ -54,17 +55,18 @@ export function getTierProgress(
 
 /** Chapters unlock in order — first incomplete previous chapter blocks next */
 export function isQuestUnlocked(quest: QuestDef, completedIds: string[]): boolean {
+  if (UNLOCK_ALL_QUESTS) return true
   const siblings = getQuestsForWorld(quest.worldId)
   const index = siblings.findIndex((q) => q.id === quest.id)
   if (index <= 0) return true
   if (completedIds.includes(quest.id)) return true
-  // Curriculum inserts (labs) should not brick players who already cleared later levels
   if (siblings.slice(index + 1).some((q) => completedIds.includes(q.id))) return true
   const prev = siblings[index - 1]
   return completedIds.includes(prev.id)
 }
 
 export function isTierUnlocked(worldId: string, tier: SkillTier, completedIds: string[]): boolean {
+  if (UNLOCK_ALL_QUESTS) return true
   if (tier === 'beginner') return true
   if (worldId === 'css-forest') {
     if (tier === 'intermediate') return completedIds.includes('css-p-boss')
