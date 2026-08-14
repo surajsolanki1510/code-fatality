@@ -13,7 +13,7 @@ import './styles/arena.css'
 import './styles/learn.css'
 import './styles/fatality.css'
 import './styles/portfolioBuilder.css'
-import './styles/cssLab.css'
+import './styles/froggyLab.css'
 import './styles/auth.css'
 import './styles/downloads.css'
 
