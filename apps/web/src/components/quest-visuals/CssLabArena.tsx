@@ -1,7 +1,8 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { CSS_LAB_BY_ID } from '../../data/quests/cssLabs'
 import type { QuestDef } from '../../data/quests/types'
+import { buildLabCss } from '../../lib/buildLabCss'
 import type { CheckResult } from '../../lib/validateQuest'
 
 type Props = {
@@ -11,7 +12,23 @@ type Props = {
   won: boolean
 }
 
-/** Froggy-style CSS mini-game — big board, instant visual feedback. */
+function Frog({ label, hue, delay }: { label: string; hue: string; delay: number }) {
+  return (
+    <div className="lab-frog" style={{ '--frog-hue': hue } as CSSProperties}>
+      <motion.div
+        className="lab-frog__body"
+        initial={{ scale: 0, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 18, delay }}
+      >
+        <span className="lab-frog__eye lab-frog__eye--l" />
+        <span className="lab-frog__eye lab-frog__eye--r" />
+        <span className="lab-frog__tag">{label}</span>
+      </motion.div>
+    </div>
+  )
+}
+
 export function CssLabArena({ quest, css, checkResults, won }: Props) {
   const lab = CSS_LAB_BY_ID[quest.id]
   const [phoneW, setPhoneW] = useState(100)
@@ -22,25 +39,30 @@ export function CssLabArena({ quest, css, checkResults, won }: Props) {
   const passed = checkResults?.filter((r) => r.passed).length ?? 0
   const total = quest.objectives.length
   const pct = Math.round((passed / total) * 100)
+  const allPassed = passed === total && total > 0
   const hasTransition = /transition\s*:/i.test(css)
 
-  const liveCss = useMemo(() => {
-    if (board.mode === 'animation' || board.mode === 'responsive') return css
-    if (board.mode === 'transition') return `${board.before}\n${css}\n${board.after}`
-    return `${board.before}\n${css}\n${board.after}`
-  }, [board, css])
-
-  const gameTitle = lab.gameTitle
-  const packLabel = lab.pack
+  const liveCss = useMemo(
+    () => buildLabCss(board.target, board.before, board.after, css, board.mode),
+    [board, css],
+  )
 
   return (
-    <div className={`css-lab css-lab--${board.mode}${won ? ' is-won' : ''}${passed > 0 && !won ? ' is-heating' : ''}`}>
+    <div
+      className={`css-lab css-lab--${board.mode}${won ? ' is-won' : ''}${allPassed ? ' is-hot' : ''}`}
+      data-game={lab.gameTitle}
+    >
+      <div className="css-lab__bg" aria-hidden />
+      <div className="css-lab__grain" aria-hidden />
+
       <header className="css-lab__hero">
         <div>
-          <p className="css-lab__game-title">{gameTitle}</p>
-          <h2 className="css-lab__level">{packLabel} · {quest.title}</h2>
+          <p className="css-lab__game-title">{lab.gameTitle}</p>
+          <h2 className="css-lab__level">
+            {lab.pack} · {quest.title}
+          </h2>
         </div>
-        <div className="css-lab__meter" aria-hidden>
+        <div className="css-lab__meter">
           <div className="css-lab__meter-fill" style={{ width: `${pct}%` }} />
           <span>{pct}%</span>
         </div>
@@ -50,162 +72,148 @@ export function CssLabArena({ quest, css, checkResults, won }: Props) {
         {won && (
           <motion.div
             className="css-lab__win-burst"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ scale: 0.4, opacity: 0, rotate: -8 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ opacity: 0 }}
           >
-            CLEARED ✦
+            SLAY ✦ CLEARED
           </motion.div>
         )}
       </AnimatePresence>
 
-      {board.mode === 'flex' && (
-        <div className="css-lab__pads" aria-hidden>
-          {[0, 1, 2].map((i) => (
-            <span key={i} className="css-lab__pad" />
-          ))}
-        </div>
-      )}
-
       <div
-        className={`css-lab__stage ${board.boardClass ?? ''}`}
-        style={board.mode === 'responsive' ? { width: `${phoneW}%`, maxWidth: '100%' } : undefined}
+        className={`css-lab__playground css-lab__playground--${board.mode}`}
+        style={board.mode === 'responsive' ? { width: `${phoneW}%` } : undefined}
       >
+        {/* Player CSS drives layout — base styles only decorate */}
         <style>{`
-          .css-lab__stage #pond, .css-lab__stage #garden, .css-lab__stage #stage {
+          .css-lab__playground .lab-board {
             width: 100%;
-            min-height: 200px;
-            height: 100%;
+            min-height: 160px;
+            flex: 1;
             box-sizing: border-box;
-            padding: 1.25rem;
-            border-radius: 20px;
-            background: rgba(0,0,0,0.2);
-            border: 2px solid rgba(255,255,255,0.15);
             position: relative;
             z-index: 2;
           }
-          .css-lab__stage .piece, .css-lab__stage #orb, .css-lab__stage #pulse {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
+          .css-lab__playground--flex .lab-board {
+            min-height: 120px;
+            width: 100%;
+            padding: 0.75rem 1rem;
+          }
+          .css-lab__playground--grid .lab-board {
+            min-height: 200px;
+            padding: 0.75rem;
+          }
+          .css-lab__playground .lab-frog {
+            flex-shrink: 0;
+          }
+          .css-lab__playground .lab-cell {
+            min-height: 72px;
+            border-radius: 14px;
             display: grid;
             place-items: center;
             font-weight: 900;
             font-size: 1.1rem;
             color: #0f172a;
-            box-shadow: 0 10px 28px rgba(0,0,0,0.35), inset 0 2px 0 rgba(255,255,255,0.35);
-            flex-shrink: 0;
-            transition: box-shadow 0.2s;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
           }
-          .css-lab__stage.is-grid-basic #garden,
-          .css-lab__stage.is-grid-3 #garden,
-          .css-lab__stage.is-grid-auto #garden {
-            min-height: 220px;
-          }
-          .css-lab__stage.is-grid-basic .piece,
-          .css-lab__stage.is-grid-3 .piece,
-          .css-lab__stage.is-grid-auto .piece,
-          .css-lab__stage.is-responsive-grid .piece {
-            border-radius: 14px;
-            width: auto;
-            min-height: 72px;
-          }
-          .css-lab__stage.is-transition,
-          .css-lab__stage.is-anim {
+          .css-lab__playground #orb,
+          .css-lab__playground #pulse {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
             display: grid;
             place-items: center;
-            min-height: 240px;
-          }
-          .css-lab__stage.is-transition #orb,
-          .css-lab__stage.is-anim #pulse {
-            width: 100px;
-            height: 100px;
             font-size: 2rem;
+            font-weight: 900;
             cursor: pointer;
+            box-shadow: 0 0 40px rgba(255,107,157,0.45);
           }
-          .css-lab__stage.is-transition #orb:not(.has-transition-css):hover {
+          .css-lab__playground #orb:not(.has-transition-css):hover {
             animation: lab-shake 0.35s ease;
-          }
-          .css-lab__stage.is-responsive #stage > .piece {
-            border-radius: 14px;
-            width: auto;
-            flex: 1;
-            min-height: 80px;
-          }
-          @keyframes lab-shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px) scale(1.2); }
-            75% { transform: translateX(8px) scale(1.2); }
-          }
-          @keyframes lab-beat {
-            0%, 100% { opacity: 0.35; }
-            50% { opacity: 1; }
           }
           ${liveCss}
         `}</style>
 
         {board.mode === 'flex' && (
-          <div id={id}>
-            {board.pieces.map((p, i) => (
-              <motion.div
-                key={p.id}
-                className="piece"
-                style={{ background: p.hue }}
-                layout
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: i * 0.08, type: 'spring', stiffness: 260 }}
-              >
-                {p.label}
-              </motion.div>
-            ))}
+          <div className="pond-scene">
+            <div className="pond-scene__sky" />
+            <div className="pond-scene__water">
+              <div className="pond-scene__ripple pond-scene__ripple--1" />
+              <div className="pond-scene__ripple pond-scene__ripple--2" />
+            </div>
+            <div className={`pond-scene__targets${allPassed ? ' is-live' : ''}`} aria-hidden>
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="pond-scene__lily" />
+              ))}
+            </div>
+            <div id={id} className="lab-board pond-scene__flex">
+              {board.pieces.map((p, i) => (
+                <Frog key={p.id} label={p.label} hue={p.hue} delay={i * 0.1} />
+              ))}
+            </div>
+            <p className="pond-scene__hint">flex row → hop the frogs onto the glowing lily pads</p>
           </div>
         )}
 
         {(board.mode === 'grid' || board.boardClass?.includes('responsive-grid')) && (
-          <div id={id}>
-            {board.pieces.map((p, i) => (
-              <motion.div
-                key={p.id}
-                className="piece"
-                style={{ background: p.hue }}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: i * 0.06 }}
-              >
-                {p.label}
-              </motion.div>
-            ))}
+          <div className="garden-scene">
+            <div className="garden-scene__sun" />
+            <div id={id} className="lab-board garden-scene__plot">
+              {board.pieces.map((p, i) => (
+                <motion.div
+                  key={p.id}
+                  className="lab-cell"
+                  style={{ background: p.hue }}
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: i * 0.07, type: 'spring' }}
+                >
+                  {p.label}
+                </motion.div>
+              ))}
+            </div>
           </div>
         )}
 
         {board.mode === 'transition' && (
-          <div
-            id="orb"
-            className={hasTransition ? 'has-transition-css' : ''}
-            style={{ background: board.pieces[0]?.hue }}
-            title="Hover me!"
-          >
-            {board.pieces[0]?.label}
+          <div className="glow-scene">
+            <div className="glow-scene__rings" aria-hidden />
+            <div
+              id="orb"
+              className={hasTransition ? 'has-transition-css glow-scene__orb' : 'glow-scene__orb'}
+              style={{ background: board.pieces[0]?.hue }}
+            >
+              {board.pieces[0]?.label}
+            </div>
+            <p className="glow-scene__hint">hover the orb — it should GLOW UP smooth, not teleport</p>
           </div>
         )}
 
         {board.mode === 'animation' && (
-          <>
-            <div className="css-lab__beat-bar" aria-hidden />
-            <div id="pulse" style={{ background: board.pieces[0]?.hue }}>
+          <div className="beat-scene">
+            <div className="beat-scene__pulse-ring beat-scene__pulse-ring--1" />
+            <div className="beat-scene__pulse-ring beat-scene__pulse-ring--2" />
+            <div id="pulse" className="beat-scene__crystal" style={{ background: board.pieces[0]?.hue }}>
               {board.pieces[0]?.label}
             </div>
-          </>
+            <div className="beat-scene__eq" aria-hidden>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <span key={n} style={{ animationDelay: `${n * 0.1}s` }} />
+              ))}
+            </div>
+          </div>
         )}
 
         {board.mode === 'responsive' && (
-          <div id={id}>
-            {board.pieces.map((p) => (
-              <div key={p.id} className="piece" style={{ background: p.hue }}>
-                {p.label}
-              </div>
-            ))}
+          <div className="shrink-scene">
+            <div id={id} className="lab-board shrink-scene__row">
+              {board.pieces.map((p) => (
+                <div key={p.id} className="lab-cell shrink-scene__block" style={{ background: p.hue }}>
+                  {p.label}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -216,26 +224,28 @@ export function CssLabArena({ quest, css, checkResults, won }: Props) {
             Shrink Ray
             <input
               type="range"
-              min={40}
+              min={38}
               max={100}
               value={phoneW}
               onChange={(e) => setPhoneW(Number(e.target.value))}
             />
           </label>
-          <span>{phoneW < 55 ? '📱 MOBILE' : '🖥️ DESKTOP'}</span>
+          <span className={phoneW < 52 ? 'is-mobile' : ''}>{phoneW < 52 ? '📱 MOBILE' : '🖥️ DESKTOP'}</span>
         </div>
       )}
 
       <p className="css-lab__tip">
         {board.mode === 'transition' && !hasTransition
-          ? '⚡ TELEPORT DETECTED — add transition so hover glides!'
+          ? '⚡ TELEPORT DETECTED — add transition property ASAP'
           : board.mode === 'transition'
-            ? '✨ Hover the orb — smooth = you win.'
+            ? '✨ Hover = your flex for smooth motion'
             : board.mode === 'animation'
-              ? '🥁 Crystal must dance on its own — @keyframes + animation.'
+              ? '🥁 Write @keyframes + animation — make it dance'
               : board.mode === 'responsive'
-                ? '📱 Shrink the slider — fix layout with @media.'
-                : '🐸 Write CSS for #pond — orbs snap when alignment is perfect.'}
+                ? '📱 @media (max-width: …) saves mobile layout'
+                : board.mode === 'grid'
+                  ? '🌱 display:grid → plant your gallery'
+                  : '🐸 Type CSS for #pond (properties OR full rule) — frogs hop live'}
       </p>
 
       <ul className="css-lab__checks">

@@ -128,9 +128,33 @@ body:has(.pf-game),
   grid-row: 1 / 4;
 }
 
+.pf-game.is-lab .pf-lesson {
+  background: rgba(10, 1, 24, 0.85);
+  color: #f8fafc;
+  border-right-color: rgba(255, 45, 149, 0.2);
+}
+
+.pf-game.is-lab .pf-lesson__title,
+.pf-game.is-lab .pf-lesson__hook,
+.pf-game.is-lab .pf-lesson__list li {
+  color: #e2e8f0;
+}
+
+.pf-game.is-lab .pf-lesson__job {
+  background: rgba(255, 45, 149, 0.1);
+  border-color: rgba(255, 45, 149, 0.25);
+}
+
+.pf-game.is-lab .pf-lesson__note {
+  background: rgba(124, 92, 255, 0.12);
+  border-left-color: var(--lab-glow, #ff2d95);
+}
+
 .pf-game.is-lab .pf-stage {
   grid-column: 2;
   grid-row: 1;
+  padding: 0;
+  background: #0a0118;
 }
 
 .pf-game.is-lab .pf-split-handle--row {

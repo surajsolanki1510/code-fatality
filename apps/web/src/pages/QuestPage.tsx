@@ -476,8 +476,8 @@ export function QuestPage() {
             <p className="pf-code__hint">
               {isCssLab
                 ? labMeta
-                  ? `Write CSS for ${labMeta.board.target}. Visual board updates live — Froggy style.`
-                  : 'Write CSS for the lab board.'
+                  ? `Style ${labMeta.board.target} — paste properties OR the full rule. Frogs hop live.`
+                  : 'Write CSS — board reacts instantly.'
                 : codeLang === 'html'
                   ? 'This HTML is your portfolio page. Type your name, photo (src="{{PHOTO}}"), and sections here.'
                   : 'This CSS is your stylesheet. Every rule you write styles the page above — it stays for every level.'}
