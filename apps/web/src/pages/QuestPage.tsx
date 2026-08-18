@@ -141,7 +141,7 @@ export function QuestPage() {
   const editorOptions = useMemo(
     () => ({
       fontFamily: 'Consolas, monospace',
-      fontSize: isPhone ? 15 : 16,
+      fontSize: isPhone ? 16 : 18,
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
       wordWrap: 'on' as const,
