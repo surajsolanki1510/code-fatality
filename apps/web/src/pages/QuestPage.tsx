@@ -33,7 +33,7 @@ export function QuestPage() {
   const [failIndex, setFailIndex] = useState(0)
   const [showVictory, setShowVictory] = useState(false)
   const [lockOutcome, setLockOutcome] = useState<LockOutcome>('idle')
-  const [phoneTab, setPhoneTab] = useState<'learn' | 'code'>('learn')
+  const [phoneTab, setPhoneTab] = useState<'learn' | 'code' | 'preview'>('learn')
   const [codeLang, setCodeLang] = useState<'html' | 'css'>('html')
   const [isPhone, setIsPhone] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 960px)').matches : false,
@@ -316,7 +316,7 @@ export function QuestPage() {
 
     return (
       <div
-        className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}${focusMode ? ' is-focus' : ''}`}
+        className={`pf-game${phoneTab === 'code' ? ' is-phone-build' : ''}${phoneTab === 'preview' ? ' is-phone-preview' : ''}${focusMode ? ' is-focus' : ''}`}
         style={splitStyle}
       >
         {UNLOCK_ALL_QUESTS && (
@@ -324,25 +324,38 @@ export function QuestPage() {
         )}
         <header className="pf-game__nav">
           <Link to={`/world/${quest.worldId}`}>← Portfolio</Link>
-          <Link to="/map">Map</Link>
+          <Link to="/map" className="pf-hide-phone">
+            Map
+          </Link>
           <Link to={`/notebook/${quest.worldId}`}>Notebook</Link>
-          <span className="pf-game__brand">PORTFOLIO FORGE</span>
+          <span className="pf-game__brand pf-hide-phone">PORTFOLIO FORGE</span>
           <button
             type="button"
-            className={`pf-focus-btn${focusMode ? ' is-on' : ''}`}
+            className={`pf-focus-btn pf-hide-phone${focusMode ? ' is-on' : ''}`}
             onClick={() => setFocusMode((f) => !f)}
           >
             {focusMode ? 'Show lesson' : 'Focus code'}
           </button>
           <span className="pf-game__chap">
-            LVL {quest.chapter} · {packLabel}
-            {quest.kind === 'boss' ? ' · BOSS' : ''}
+            LVL {quest.chapter}
+            <span className="pf-hide-phone">
+              {' '}
+              · {packLabel}
+              {quest.kind === 'boss' ? ' · BOSS' : ''}
+            </span>
           </span>
         </header>
 
         <nav className="pf-phone-tabs" aria-label="Sections">
           <button type="button" className={phoneTab === 'learn' ? 'is-on' : ''} onClick={() => setPhoneTab('learn')}>
             Learn
+          </button>
+          <button
+            type="button"
+            className={phoneTab === 'preview' ? 'is-on' : ''}
+            onClick={() => setPhoneTab('preview')}
+          >
+            Preview
           </button>
           <button type="button" className={phoneTab === 'code' ? 'is-on' : ''} onClick={() => setPhoneTab('code')}>
             Code
@@ -444,11 +457,21 @@ export function QuestPage() {
               <button type="button" className="pf-lesson__cta" onClick={() => setPhoneTab('code')}>
                 Code your portfolio →
               </button>
+              <button
+                type="button"
+                className="pf-lesson__cta pf-lesson__cta--ghost"
+                onClick={() => setPhoneTab('preview')}
+              >
+                See live site →
+              </button>
             </div>
           </aside>
 
-          <section className={`pf-stage${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
+          <section className={`pf-stage${phoneTab === 'preview' ? ' is-phone-on' : ''}`}>
             <PortfolioBuilderArena previewSrcDoc={previewSrcDoc} />
+            <button type="button" className="pf-stage__edit" onClick={() => setPhoneTab('code')}>
+              Edit HTML / CSS
+            </button>
           </section>
 
           {!isPhone && (
@@ -482,8 +505,12 @@ export function QuestPage() {
             </div>
             <p className="pf-code__hint">
               {codeLang === 'html'
-                ? 'This HTML is your portfolio page. Type your name, photo (src="{{PHOTO}}"), and sections here.'
-                : 'This CSS is your stylesheet. Every rule you write styles the page above — it stays for every level.'}
+                ? isPhone
+                  ? 'This is your live page. Type your name and sections, then open Preview.'
+                  : 'This HTML is your portfolio page. Type your name, photo (src="{{PHOTO}}"), and sections here.'
+                : isPhone
+                  ? 'This CSS styles your live site. Open Preview to see every change.'
+                  : 'This CSS is your stylesheet. Every rule you write styles the page above — it stays for every level.'}
             </p>
             <div className="pf-code__editor">
               {isPhone ? (
@@ -558,7 +585,7 @@ export function QuestPage() {
             Hint
           </button>
           <button type="button" className="pf-code__btn pf-code__btn--publish" onClick={onPostGlow}>
-            PUBLISH SECTION
+            {isPhone ? 'PUBLISH' : 'PUBLISH SECTION'}
           </button>
           {feedback?.type === 'win' && nextQuest && (
             <button type="button" className="pf-code__btn pf-code__btn--next" onClick={() => navigate(`/quest/${nextQuest.id}`)}>

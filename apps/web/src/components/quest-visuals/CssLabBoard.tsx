@@ -203,6 +203,32 @@ export function CssLabBoard({ quest, css, checkResults, won }: Props) {
           background: linear-gradient(180deg, #7dd3fc, #0284c7);
           box-shadow: 0 4px 0 #0369a1;
         }
+        @media (max-width: 900px) {
+          .froggy-board--flex .lab-target {
+            min-height: 0;
+            padding: 0.45rem;
+            gap: 0.35rem;
+          }
+          .froggy-board--flex .froggy-slot {
+            width: 58px;
+          }
+          .froggy-board--grid .lab-target,
+          .froggy-board--responsive .lab-target {
+            min-height: 0;
+            padding: 0.45rem;
+          }
+          .froggy-board--grid .lab-cell,
+          .froggy-board--responsive .lab-cell {
+            min-height: 44px;
+            font-size: 0.85rem;
+          }
+          .froggy-board #orb,
+          .froggy-board #pulse {
+            width: 64px;
+            height: 64px;
+            font-size: 1.2rem;
+          }
+        }
         @keyframes froggy-hop {
           0%, 100% { transform: translateY(0); }
           35% { transform: translateY(-18px) scale(1.05); }
