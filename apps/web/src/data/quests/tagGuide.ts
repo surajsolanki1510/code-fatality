@@ -590,6 +590,20 @@ function normalizeTagKey(tag: string): string {
   return tag.replace(/[<>/\s]/g, '').toLowerCase().split('{')[0]!.trim()
 }
 
+function lessonFromGuide(key: string): TagLesson | null {
+  const guide = TAG_GUIDE[key]
+  if (!guide) return null
+  return {
+    tag: guide.tag,
+    purpose: guide.purpose,
+    why: guide.why,
+    whenToUse: guide.whenToUse,
+    attributes: guide.attributes,
+    example: guide.example,
+    mistake: guide.mistake,
+  }
+}
+
 /** Merge quest tagLessons with the simple TAG_GUIDE encyclopedia. */
 export function enrichTagLessons(lessons: TagLesson[]): TagLesson[] {
   return lessons.map((lesson) => {
@@ -606,4 +620,36 @@ export function enrichTagLessons(lessons: TagLesson[]): TagLesson[] {
       mistake: guide.mistake ?? lesson.mistake,
     }
   })
+}
+
+/** Keep every mission tag in the instruction list — not just the first one. */
+export function completeTagLessons(quest: {
+  tagLessons: TagLesson[]
+  objectives: { id: string; label: string }[]
+}): TagLesson[] {
+  const lessons: TagLesson[] = []
+  const seen = new Set<string>()
+
+  const add = (lesson: TagLesson) => {
+    const key = normalizeTagKey(lesson.tag)
+    if (!key || seen.has(key)) return
+    seen.add(key)
+    lessons.push(lesson)
+  }
+
+  for (const lesson of quest.tagLessons) add(lesson)
+
+  for (const obj of quest.objectives) {
+    const fromId = lessonFromGuide(obj.id)
+    if (fromId) add(fromId)
+
+    const names = obj.label.match(/<\/?([a-z][a-z0-9]*)\b/gi) ?? []
+    for (const raw of names) {
+      const key = raw.replace(/[</>]/g, '').toLowerCase()
+      const extra = lessonFromGuide(key)
+      if (extra) add(extra)
+    }
+  }
+
+  return lessons
 }

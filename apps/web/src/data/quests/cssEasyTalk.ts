@@ -72,7 +72,7 @@ export function makeCssEasy(quest: QuestDef): QuestDef {
     realWorldWin: quest.realWorldWin
       ? quest.realWorldWin.split(/[.!]/)[0].trim() + '.'
       : quest.realWorldWin,
-    tagLessons: quest.tagLessons.slice(0, 2).map((lesson) => ({
+    tagLessons: quest.tagLessons.map((lesson) => ({
       tag: lesson.tag,
       purpose: plainPurpose(lesson),
       example: shortExample(lesson.example),

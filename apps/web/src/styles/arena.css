@@ -675,8 +675,8 @@ button {
     --landing-gutter: clamp(3.5rem, 20vw, 6rem);
     --landing-fighter-h: clamp(160px, 38dvh, 280px);
     --landing-title: clamp(2.55rem, 10vw, 3.2rem);
-    --landing-tag: clamp(0.72rem, 2.2vw, 0.84rem);
-    --landing-cta: clamp(0.92rem, 3vw, 1.05rem);
+    --landing-tag: clamp(0.84rem, 2.4vw, 0.95rem);
+    --landing-cta: clamp(1rem, 3.2vw, 1.12rem);
     grid-template-rows: minmax(0, 0.7fr) auto minmax(0, 1.1fr);
   }
 
@@ -1118,10 +1118,48 @@ html.viewport-lock #root {
   .notebook-head {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.65rem;
   }
 
   .notebook-subjects {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .notebook-subjects button,
+  .notebook-subjects a {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  .world-detail-hero {
+    height: clamp(180px, 42vw, 240px);
+  }
+
+  .world-detail-hero__copy {
+    padding: 1rem 1.05rem 1.15rem;
+  }
+
+  .world-detail-hero .arena-title {
+    font-size: clamp(1.55rem, 7vw, 2.1rem);
+  }
+
+  .fighter-card__name {
+    font-size: clamp(1.25rem, 5.5vw, 1.5rem);
+  }
+
+  .fighter-card__sub {
+    font-size: 1rem;
+  }
+
+  .fighter-card__notebook {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+
+  .notebook-book__input {
+    font: 600 1.08rem/1.7 'Rajdhani', system-ui, sans-serif;
+    padding: 0.7rem 0.9rem;
   }
 
   html.viewport-lock,

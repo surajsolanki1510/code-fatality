@@ -3,14 +3,17 @@ import { HTML_INTERMEDIATE } from './htmlIntermediate'
 import { HTML_EXPERT } from './htmlExpert'
 import { CSS_PORTFOLIO_QUESTS } from './cssPortfolio'
 import { storyBeatsFor } from './htmlStoryBeats'
-import { enrichTagLessons } from './tagGuide'
+import { completeTagLessons, enrichTagLessons } from './tagGuide'
 import type { QuestDef, SkillTier } from './types'
 import { UNLOCK_ALL_QUESTS } from '../../config/gameFlags'
 
 function withStoryBeats(quests: QuestDef[]): QuestDef[] {
   return quests.map((q) => ({
     ...q,
-    tagLessons: enrichTagLessons(q.tagLessons),
+    tagLessons: completeTagLessons({
+      ...q,
+      tagLessons: enrichTagLessons(q.tagLessons),
+    }),
     storyBeats: storyBeatsFor(q.id) ?? q.storyBeats,
   }))
 }

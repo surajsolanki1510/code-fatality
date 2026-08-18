@@ -31,9 +31,10 @@ export function AuthPage() {
     setBusy(true)
     setError(null)
     let err: string | null = null
-    if (mode === 'login') err = await login(email, password)
-    else if (mode === 'signup') err = await register(email, password, displayName || undefined)
-    else err = await claimAccount(email, password, displayName || undefined)
+    const mail = email.trim()
+    if (mode === 'login') err = await login(mail, password)
+    else if (mode === 'signup') err = await register(mail, password, displayName.trim() || undefined)
+    else err = await claimAccount(mail, password, displayName.trim() || undefined)
     setBusy(false)
     if (err) {
       setError(err)

@@ -1,5 +1,14 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import {
+  isLocalToken,
+  isNetworkAuthError,
+  localClaim,
+  localGuest,
+  localLogin,
+  localRegister,
+  saveLocalProgress,
+} from '../lib/localAuth'
 
 export type AuthUser = {
   id: string
@@ -52,7 +61,9 @@ const initial = {
   badges: [] as string[],
 }
 
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:4000' : 'https://code-fatality.onrender.com')
 
 function applyAuth(set: (partial: Partial<ProgressState>) => void, data: AuthResponse) {
   set({
@@ -70,14 +81,36 @@ function applyAuth(set: (partial: Partial<ProgressState>) => void, data: AuthRes
 async function api<T>(path: string, init?: RequestInit, token?: string | null): Promise<T> {
   const headers = new Headers(init?.headers)
   if (!headers.has('Content-Type') && init?.body) headers.set('Content-Type', 'application/json')
-  if (token) headers.set('Authorization', `Bearer ${token}`)
+  if (token && !isLocalToken(token)) headers.set('Authorization', `Bearer ${token}`)
 
-  const res = await fetch(`${API_BASE}${path}`, { ...init, headers })
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) {
-    throw new Error((data as { error?: string }).error ?? `Request failed (${res.status})`)
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 8000)
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { ...init, headers, signal: controller.signal })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error((data as { error?: string }).error ?? `Request failed (${res.status})`)
+    }
+    return data as T
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Server timed out')
+    }
+    throw err
+  } finally {
+    window.clearTimeout(timer)
   }
-  return data as T
+}
+
+function snapshotLocalProgress() {
+  const state = useProgressStore.getState()
+  if (!state.userId || !isLocalToken(state.token)) return
+  saveLocalProgress({
+    userId: state.userId,
+    xp: state.xp,
+    completedQuestIds: state.completedQuestIds,
+    badges: state.badges,
+  })
 }
 
 export const useProgressStore = create<ProgressState>()(
@@ -89,6 +122,10 @@ export const useProgressStore = create<ProgressState>()(
         set({ loading: true })
         try {
           const token = get().token
+          if (token && isLocalToken(token)) {
+            set({ booted: true, loading: false })
+            return
+          }
           if (token) {
             const me = await api<{ user: AuthUser; progress: ProgressPayload }>(
               '/v1/auth/me',
@@ -115,42 +152,70 @@ export const useProgressStore = create<ProgressState>()(
         try {
           const data = await api<AuthResponse>('/v1/auth/register', {
             method: 'POST',
-            body: JSON.stringify({ email, password, displayName }),
+            body: JSON.stringify({ email: email.trim(), password, displayName }),
           })
           applyAuth(set, data)
           return null
         } catch (err) {
-          return err instanceof Error ? err.message : 'Signup failed'
+          if (!isNetworkAuthError(err)) {
+            return err instanceof Error ? err.message : 'Signup failed'
+          }
+          try {
+            applyAuth(set, await localRegister(email, password, displayName))
+            return null
+          } catch (localErr) {
+            return localErr instanceof Error ? localErr.message : 'Signup failed'
+          }
         }
       },
       login: async (email, password) => {
         try {
           const data = await api<AuthResponse>('/v1/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email: email.trim(), password }),
           })
           applyAuth(set, data)
           return null
         } catch (err) {
-          return err instanceof Error ? err.message : 'Login failed'
+          if (!isNetworkAuthError(err)) {
+            return err instanceof Error ? err.message : 'Login failed'
+          }
+          try {
+            applyAuth(set, await localLogin(email, password))
+            return null
+          } catch (localErr) {
+            return localErr instanceof Error ? localErr.message : 'Login failed'
+          }
         }
       },
       claimAccount: async (email, password, displayName) => {
         try {
           const token = get().token
           if (!token) return 'Start as guest first'
+          if (isLocalToken(token)) {
+            applyAuth(set, await localClaim(get().userId ?? '', email, password, displayName))
+            return null
+          }
           const data = await api<AuthResponse>(
             '/v1/auth/claim',
             {
               method: 'POST',
-              body: JSON.stringify({ email, password, displayName }),
+              body: JSON.stringify({ email: email.trim(), password, displayName }),
             },
             token,
           )
           applyAuth(set, data)
           return null
         } catch (err) {
-          return err instanceof Error ? err.message : 'Could not save account'
+          if (!isNetworkAuthError(err)) {
+            return err instanceof Error ? err.message : 'Could not save account'
+          }
+          try {
+            applyAuth(set, await localClaim(get().userId ?? '', email, password, displayName))
+            return null
+          } catch (localErr) {
+            return localErr instanceof Error ? localErr.message : 'Could not save account'
+          }
         }
       },
       playAsGuest: async () => {
@@ -159,7 +224,11 @@ export const useProgressStore = create<ProgressState>()(
           applyAuth(set, data)
           return null
         } catch (err) {
-          return err instanceof Error ? err.message : 'Guest start failed'
+          if (!isNetworkAuthError(err)) {
+            return err instanceof Error ? err.message : 'Guest start failed'
+          }
+          applyAuth(set, localGuest())
+          return null
         }
       },
       logout: () => {
@@ -172,8 +241,9 @@ export const useProgressStore = create<ProgressState>()(
           completedQuestIds: [...s.completedQuestIds, questId],
           badges: badgeId && !s.badges.includes(badgeId) ? [...s.badges, badgeId] : s.badges,
         }))
+        snapshotLocalProgress()
         const token = get().token
-        if (!token) return
+        if (!token || isLocalToken(token)) return
         void api<ProgressPayload>(
           '/v1/progress/complete',
           {

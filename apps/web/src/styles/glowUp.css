@@ -695,20 +695,21 @@ body:has(.glow-up-game),
   .glow-up-phone-tabs {
     display: flex;
     flex-shrink: 0;
-    gap: 0.35rem;
-    padding: 0.35rem 0.65rem;
+    gap: 0.4rem;
+    padding: 0.45rem 0.7rem;
   }
 
   .glow-up-phone-tabs button {
     flex: 1;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
-    padding: 0.45rem;
+    border-radius: 10px;
+    padding: 0.7rem;
+    min-height: 48px;
     background: transparent;
     color: var(--gu-muted);
     font-family: inherit;
     font-weight: 800;
-    font-size: 0.78rem;
+    font-size: 1.05rem;
   }
 
   .glow-up-phone-tabs button.is-on {
@@ -749,19 +750,29 @@ body:has(.glow-up-game),
   .glow-up-phone-actions {
     display: flex;
     flex-shrink: 0;
-    gap: 0.4rem;
-    padding: 0.45rem 0.65rem;
+    gap: 0.5rem;
+    padding: 0.65rem 0.7rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .glow-up-phone-actions .glow-up-editor__btn {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    min-height: 48px;
+    border-radius: 12px;
   }
 
   .glow-up-phone-actions .glow-up-editor__btn--post {
     flex: 1;
+    font-size: 1.08rem;
   }
 
   .glow-up-phone-cta {
     display: block;
     width: 100%;
     margin-top: 1rem;
-    padding: 0.7rem;
+    padding: 0.9rem;
+    min-height: 52px;
+    font-size: 1.08rem;
     border: none;
     border-radius: 12px;
     background: linear-gradient(135deg, var(--gu-rose), #ffb4c8);

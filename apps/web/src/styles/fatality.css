@@ -59,6 +59,10 @@ body:has(.fatality-game) {
   color: var(--f-muted);
   text-decoration: none;
   font-weight: 600;
+  font-size: clamp(0.95rem, 2.4vw, 1.05rem);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .fatality-game__nav a:hover {
@@ -507,8 +511,6 @@ body:has(.fatality-game) {
   inset: 0;
   display: flex;
   flex-direction: column;
-  container-type: size;
-  container-name: arena;
 }
 
 .fatality-arena__bg {
@@ -712,6 +714,9 @@ body:has(.fatality-game) {
   z-index: 2;
   min-height: 0;
   margin-bottom: 4.25rem;
+  overflow: hidden;
+  container-type: size;
+  container-name: stage;
 }
 
 .fatality-faceoff {
@@ -781,32 +786,35 @@ body:has(.fatality-game) {
 
 .fatality-fighter {
   position: absolute;
-  bottom: 7%;
-  width: min(280px, 36cqi);
+  bottom: 2%;
+  width: min(30cqi, 240px);
+  max-height: 86%;
   z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   transition: transform 0.15s ease;
-  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.65));
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.65));
 }
 
 .fatality-fighter img {
   width: 100%;
   height: auto;
-  max-height: min(72cqb, 420px);
+  max-height: 86cqb;
   object-fit: contain;
   object-position: bottom center;
   display: block;
   user-select: none;
   pointer-events: none;
-  /* knock out solid black photo backgrounds over the arena video */
   mix-blend-mode: lighten;
 }
 
 .fatality-fighter--hero {
-  left: 6%;
+  left: 10%;
 }
 
 .fatality-fighter--enemy {
-  right: 6%;
+  right: 10%;
 }
 
 .fatality-fighter--hero.is-attack {
@@ -833,15 +841,15 @@ body:has(.fatality-game) {
 
 @keyframes hero-lunge {
   0% { transform: translateX(0) scale(1) rotate(0deg); }
-  25% { transform: translateX(-18px) scale(0.96) rotate(-3deg); }
-  55% { transform: translateX(92px) scale(1.14) rotate(4deg); }
+  25% { transform: translateX(-10px) scale(0.97) rotate(-2deg); }
+  55% { transform: translateX(36px) scale(1.06) rotate(3deg); }
   100% { transform: translateX(0) scale(1) rotate(0deg); }
 }
 
 @keyframes enemy-lunge {
   0% { transform: translateX(0) scale(1) rotate(0deg); }
-  25% { transform: translateX(18px) scale(0.96) rotate(3deg); }
-  55% { transform: translateX(-92px) scale(1.12) rotate(-4deg); }
+  25% { transform: translateX(10px) scale(0.97) rotate(2deg); }
+  55% { transform: translateX(-36px) scale(1.06) rotate(-3deg); }
   100% { transform: translateX(0) scale(1) rotate(0deg); }
 }
 
@@ -1142,15 +1150,15 @@ body:has(.fatality-game) {
 @media (max-width: 700px) {
   .fatality-hud {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: 0.3rem;
-    padding: 0.3rem 0.4rem 0.1rem;
+    gap: 0.4rem;
+    padding: 0.45rem 0.5rem 0.2rem;
     align-items: center;
   }
 
   .fatality-hud__center {
     grid-column: auto;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.25rem;
   }
 
   .fatality-hud__vs {
@@ -1158,62 +1166,73 @@ body:has(.fatality-game) {
   }
 
   .fatality-hud__fighter {
-    padding: 0.28rem 0.4rem;
-    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+    border-radius: 10px;
   }
 
   .fatality-hud__name {
-    font-size: 0.62rem;
+    font-size: 0.85rem;
   }
 
   .fatality-hud__bar {
-    height: 7px;
+    height: 10px;
   }
 
   .fatality-hud__hp {
-    font-size: 0.58rem;
+    font-size: 0.8rem;
   }
 
   .fatality-hud__combo {
-    font-size: 0.55rem;
-    padding: 0.15rem 0.4rem;
+    font-size: 0.72rem;
+    padding: 0.25rem 0.5rem;
   }
 
   .fatality-hud__combo strong {
-    font-size: 0.72rem;
+    font-size: 0.95rem;
   }
 
   .fatality-hud__tab {
-    font-size: 0.58rem;
-    padding: 0.2rem 0.45rem;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.55rem;
+    min-height: 36px;
   }
 
   .fatality-fighter {
-    width: min(160px, 38cqi);
+    width: min(32cqi, 150px);
   }
 
   .fatality-fighter--hero {
-    left: 4%;
+    left: 8%;
   }
 
   .fatality-fighter--enemy {
-    right: 4%;
+    right: 8%;
   }
 
   .fatality-fighter img {
-    max-height: min(62cqb, 240px);
+    max-height: 78cqb;
   }
 
   .fatality-stage {
-    margin-bottom: 0.5rem;
+    margin-bottom: 3.4rem;
   }
 
   .fatality-preview {
-    margin: 0.25rem 0.5rem 0.5rem;
+    margin: 0.25rem 0.5rem 3.4rem;
   }
 
   .fatality-coach {
-    display: none;
+    padding: 0.4rem 0.55rem 0.5rem;
+  }
+
+  .fatality-coach__bubble p {
+    font-size: 0.95rem;
+    line-height: 1.35;
+    -webkit-line-clamp: 3;
+  }
+
+  .fatality-coach__bubble strong {
+    font-size: 0.78rem;
   }
 
   .fatality-faceoff,
@@ -1226,16 +1245,25 @@ body:has(.fatality-game) {
 /* ——— Phone: one job per screen ——— */
 @media (max-width: 960px) {
   .fatality-game__nav {
-    padding: 0.35rem 0.7rem;
-    gap: 0.55rem;
+    padding: 0.5rem 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .fatality-game__nav a {
+    font-size: 1rem;
   }
 
   .fatality-game__brand {
-    font-size: 0.92rem;
+    font-size: 1.15rem;
+  }
+
+  .fatality-game__notebook {
+    font-size: 0.82rem;
+    padding: 0.35rem 0.7rem;
   }
 
   .fatality-game__chap {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     letter-spacing: 0.08em;
   }
 
@@ -1243,8 +1271,8 @@ body:has(.fatality-game) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     flex-shrink: 0;
-    gap: 0.25rem;
-    padding: 0.35rem 0.55rem;
+    gap: 0.35rem;
+    padding: 0.45rem 0.65rem;
     background: #100810;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
@@ -1252,12 +1280,13 @@ body:has(.fatality-game) {
   .fatality-phone-tabs button {
     position: relative;
     font-family: var(--font-f);
-    font-weight: 700;
-    font-size: 0.82rem;
+    font-weight: 800;
+    font-size: 1.05rem;
     letter-spacing: 0.04em;
     border: none;
-    border-radius: 10px;
-    padding: 0.55rem 0.35rem;
+    border-radius: 12px;
+    padding: 0.7rem 0.4rem;
+    min-height: 48px;
     cursor: pointer;
     background: transparent;
     color: var(--f-muted);
@@ -1270,7 +1299,7 @@ body:has(.fatality-game) {
 
   .fatality-phone-tabs__badge {
     margin-left: 0.25rem;
-    font-size: 0.65rem;
+    font-size: 0.85rem;
     font-weight: 800;
     color: var(--f-teal);
   }
@@ -1300,15 +1329,17 @@ body:has(.fatality-game) {
     flex: 1 1 0;
     min-height: 0;
     height: 100%;
+    background:
+      radial-gradient(ellipse at 0% 0%, rgba(255, 59, 92, 0.18), transparent 55%),
+      linear-gradient(165deg, #1a1018, #120a12);
   }
 
-  /* Fight tab: wide arena on top, editor underneath */
   .fatality-game.is-phone-battle .fatality-play.is-phone-on {
     display: block;
     position: relative;
-    flex: 0 0 38%;
-    min-height: 180px;
-    max-height: 40vh;
+    flex: 0 0 clamp(200px, 34vh, 280px);
+    min-height: 200px;
+    max-height: 38vh;
     overflow: hidden;
     border-bottom: 2px solid rgba(255, 59, 92, 0.35);
   }
@@ -1322,64 +1353,38 @@ body:has(.fatality-game) {
     box-shadow: none;
   }
 
-  .fatality-teach.is-phone-on {
-    background:
-      radial-gradient(ellipse at 0% 0%, rgba(255, 59, 92, 0.18), transparent 55%),
-      linear-gradient(165deg, #1a1018, #120a12);
-  }
-
   .fatality-teach__scroll {
     flex: 1;
-    padding: 0.85rem 0.9rem 1rem;
-  }
-
-  .fatality-howto {
-    margin-bottom: 0.85rem;
-    border-radius: 14px;
-    box-shadow: none;
-  }
-
-  .fatality-howto strong {
-    font-size: 0.95rem;
-  }
-
-  .fatality-howto p {
-    font-size: 0.84rem;
-    line-height: 1.4;
+    padding: 1rem 1.05rem 1.15rem;
   }
 
   .fatality-teach__title {
-    font-size: 1.35rem;
-    margin-bottom: 0.45rem;
-  }
-
-  .fatality-teach__hook {
-    font-size: 0.9rem;
-    margin-bottom: 0.85rem;
-  }
-
-  .fatality-explain h2 {
-    font-size: 0.7rem;
-  }
-
-  .fatality-explain p,
-  .fatality-explain span {
-    font-size: 0.84rem;
-  }
-
-  .fatality-explain code,
-  .fatality-explain em {
-    font-size: 0.78rem;
-  }
-
-  .fatality-missions h2 {
-    font-size: 0.72rem;
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
     margin-bottom: 0.5rem;
   }
 
+  .fatality-teach__hook {
+    font-size: 1.08rem;
+    line-height: 1.5;
+    margin-bottom: 0.9rem;
+  }
+
+  .fatality-explain h2,
+  .fatality-missions h2 {
+    font-size: 0.85rem;
+  }
+
+  .fatality-explain p,
+  .fatality-explain span,
+  .fatality-explain code,
+  .fatality-explain em {
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
   .fatality-missions li {
-    font-size: 0.95rem;
-    padding: 0.6rem 0.7rem;
+    font-size: 1.08rem;
+    padding: 0.75rem 0.8rem;
   }
 
   .fatality-phone-cta {
@@ -1388,20 +1393,15 @@ body:has(.fatality-game) {
     margin-top: 1rem;
     font-family: var(--font-f);
     font-weight: 800;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
+    font-size: 1.1rem;
     border: none;
     border-radius: 12px;
-    padding: 0.85rem 1rem;
+    padding: 0.95rem 1rem;
+    min-height: 52px;
     cursor: pointer;
     color: #1a1208;
     background: linear-gradient(180deg, #ffe27a, #f0c040);
     box-shadow: 0 3px 0 #b8860b;
-  }
-
-  .fatality-editor.is-phone-on {
-    border-top: none;
-    box-shadow: none;
   }
 
   .fatality-editor__bar--desktop {
@@ -1410,44 +1410,51 @@ body:has(.fatality-game) {
 
   .fatality-editor__missions {
     display: flex;
+    padding: 0.55rem 0.7rem 0.25rem;
+  }
+
+  .fatality-chip {
+    font-size: 0.92rem;
+    padding: 0.4rem 0.7rem;
   }
 
   .fatality-editor__monaco {
     flex: 1 1 0;
-    height: auto;
-    min-height: 120px;
+    min-height: 160px;
   }
 
   .fatality-editor__textarea {
-    min-height: 180px;
-    font-size: 1rem;
-    padding: 0.7rem;
+    min-height: 200px;
+    font-size: 1.12rem;
+    line-height: 1.5;
+    padding: 0.85rem;
   }
 
   .fatality-toast {
     max-height: none;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.8rem;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.95rem;
   }
 
   .fatality-phone-actions {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 0.65rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.55rem;
+    padding: 0.65rem 0.7rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(180deg, #1c1018, #0e0a10);
     border-top: 2px solid rgba(255, 59, 92, 0.4);
   }
 
   .fatality-phone-actions .fatality-editor__btn {
-    font-size: 0.9rem;
-    padding: 0.65rem 1rem;
-    min-height: 44px;
+    font-size: 1rem;
+    padding: 0.75rem 1.05rem;
+    min-height: 48px;
   }
 
   .fatality-phone-actions .fatality-editor__btn--check {
     flex: 1;
+    font-size: 1.12rem;
   }
 
   .fatality-game.is-phone-battle .fatality-arena {
@@ -1456,70 +1463,101 @@ body:has(.fatality-game) {
   }
 
   .fatality-game.is-phone-battle .fatality-hud {
-    padding: 0.25rem 0.35rem 0.05rem;
-    gap: 0.25rem;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  }
-
-  .fatality-game.is-phone-battle .fatality-hud__fighter {
-    padding: 0.22rem 0.35rem;
+    padding: 0.4rem 0.5rem 0.15rem;
+    gap: 0.35rem;
   }
 
   .fatality-game.is-phone-battle .fatality-hud__name {
-    font-size: 0.58rem;
-    margin-bottom: 0;
+    font-size: 0.88rem;
   }
 
   .fatality-game.is-phone-battle .fatality-hud__bar {
-    height: 6px;
+    height: 11px;
   }
 
   .fatality-game.is-phone-battle .fatality-hud__hp {
     display: inline;
-    font-size: 0.55rem;
+    font-size: 0.82rem;
   }
 
   .fatality-game.is-phone-battle .fatality-hud__combo {
-    font-size: 0.52rem;
-    padding: 0.12rem 0.35rem;
+    font-size: 0.78rem;
+    padding: 0.28rem 0.5rem;
   }
 
   .fatality-game.is-phone-battle .fatality-hud__combo strong {
-    font-size: 0.68rem;
+    font-size: 0.95rem;
   }
 
   .fatality-game.is-phone-battle .fatality-hud__tab {
-    font-size: 0.55rem;
-    padding: 0.16rem 0.4rem;
+    font-size: 0.82rem;
+    padding: 0.35rem 0.55rem;
+    min-height: 36px;
   }
 
-  .fatality-game.is-phone-battle .fatality-stage {
-    margin-bottom: 0;
-  }
-
+  .fatality-game.is-phone-battle .fatality-stage,
   .fatality-game.is-phone-battle .fatality-preview {
-    margin: 0.2rem 0.4rem 0.2rem;
+    margin-bottom: 3.2rem;
   }
 
   .fatality-game.is-phone-battle .fatality-fighter {
-    width: min(120px, 34cqi);
+    width: min(30cqi, 130px);
     bottom: 2%;
   }
 
   .fatality-game.is-phone-battle .fatality-fighter img {
-    max-height: min(58cqb, 150px);
+    max-height: 72cqb;
+  }
+
+  .fatality-game__nav a {
+    min-height: 44px;
+  }
+
+  .fatality-editor__missions {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    row-gap: 0.35rem;
+  }
+
+  .fatality-chip {
+    white-space: normal;
+  }
+
+  .fatality-phone-actions .fatality-editor__btn--ghost {
+    min-width: 4.6rem;
+    border-radius: 12px;
+  }
+
+  .fatality-game.is-phone-battle .fatality-coach {
+    left: 0.45rem;
+    right: 0.45rem;
+    bottom: 0.3rem;
+  }
+
+  .fatality-game.is-phone-battle .fatality-coach__face {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fatality-game.is-phone-battle .fatality-coach__bubble {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .fatality-game.is-phone-battle .fatality-coach__bubble p {
+    font-size: 0.95rem;
+    line-height: 1.35;
+    -webkit-line-clamp: 3;
+  }
+
+  .fatality-game.is-phone-battle .fatality-coach__bubble strong {
+    font-size: 0.78rem;
   }
 
   .fatality-game.is-phone-battle .fatality-strike strong {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
   }
 
   .fatality-game.is-phone-battle .fatality-stamp {
     font-size: 1.8rem;
-    top: 48%;
-  }
-
-  .fatality-game.is-phone-battle .fatality-stamp span {
-    font-size: 0.65rem;
   }
 }

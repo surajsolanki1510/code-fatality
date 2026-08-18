@@ -141,7 +141,7 @@ export function QuestPage() {
   const editorOptions = useMemo(
     () => ({
       fontFamily: 'Consolas, monospace',
-      fontSize: isPhone ? 16 : 18,
+      fontSize: isPhone ? 18 : 18,
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
       wordWrap: 'on' as const,
@@ -288,11 +288,9 @@ export function QuestPage() {
     }
 
     const packLabel = quest.story[0]?.replace('Portfolio section: ', '') || 'CSS'
-    const lesson = quest.tagLessons[0]
     const isLaunch = quest.id === 'css-p-e-boss'
     const showLaunch = isLaunch && (lockOutcome === 'win' || alreadyDone)
     const htmlStructureSnippet = `<header>\n  <h1>Your Name</h1>\n  <p>Your role / tagline</p>\n</header>\n\n<main>\n  <section id="about"></section>\n  <section id="projects"></section>\n  <section id="contact"></section>\n</main>`
-    const lessonSnippet = lesson?.example?.trim() || ''
 
     const onColResizeStart = (e: ReactMouseEvent) => {
       e.preventDefault()
@@ -367,21 +365,21 @@ export function QuestPage() {
                 <p>{quest.missionBrief}</p>
               </div>
 
-              {lesson && (
-                <div className="pf-lesson__note">
+              {quest.tagLessons.map((lesson) => (
+                <div key={`${quest.id}-${lesson.tag}`} className="pf-lesson__note">
                   <code>Use: {lesson.tag}</code>
                   <pre>{lesson.example}</pre>
                   <button
                     type="button"
                     className="pf-code__btn pf-code__btn--ghost"
                     onClick={() =>
-                      void copyText(lessonSnippet).then(() => setFeedback({ type: 'win', text: 'Snippet copied.' }))
+                      void copyText(lesson.example).then(() => setFeedback({ type: 'win', text: 'Snippet copied.' }))
                     }
                   >
                     Copy code
                   </button>
                 </div>
-              )}
+              ))}
 
               {codeLang === 'html' && (
                 <div className="pf-lesson__note">
@@ -635,7 +633,7 @@ export function QuestPage() {
 
               <div className="fatality-explain">
                 <h2>Instruction + code</h2>
-                {quest.tagLessons.slice(0, 1).map((lesson) => (
+                {quest.tagLessons.map((lesson) => (
                   <article key={`${quest.id}-${lesson.tag}`} className="fatality-tag-card">
                     <code>Use this tag: {lesson.tag}</code>
                     <p>{lesson.purpose}</p>

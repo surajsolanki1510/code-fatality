@@ -45,25 +45,25 @@ export function CssLabFroggyGame({
   isPhone,
 }: Props) {
   const navigate = useNavigate()
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState('')
   const lab = CSS_LAB_BY_ID[quest.id]
   if (!lab) return null
 
-  const lesson = quest.tagLessons[0]
+  const lessons = quest.tagLessons
   const target = lab.board.target
   const passed = liveCheck?.results.filter((r) => r.passed).length ?? 0
   const total = quest.objectives.length
 
   const showJustifyHints = lab.board.mode === 'flex' && /justify-content/i.test(quest.missionBrief ?? '')
-  const codeExample = lesson?.example?.trim() || `${target} {\n  display: flex;\n}`
+  const fallbackExample = `${target} {\n  display: flex;\n}`
 
   const copyCode = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1400)
+      setCopied(text)
+      window.setTimeout(() => setCopied(''), 1400)
     } catch {
-      setCopied(false)
+      setCopied('')
     }
   }
 
@@ -89,15 +89,29 @@ export function CssLabFroggyGame({
           <div className="froggy-panel__body">
             <p className="froggy-panel__hook">{quest.hook}</p>
 
-            {lesson && (
-              <div className="froggy-panel__instruction">
-                <p className="froggy-panel__explain">{lesson.purpose}</p>
-                <pre className="froggy-panel__snippet">{codeExample}</pre>
-                <button type="button" className="froggy-panel__copy" onClick={() => void copyCode(codeExample)}>
-                  {copied ? 'Copied!' : 'Copy code'}
-                </button>
-              </div>
-            )}
+            {lessons.length > 0
+              ? lessons.map((lesson) => {
+                  const codeExample = lesson.example?.trim() || fallbackExample
+                  return (
+                    <div key={`${quest.id}-${lesson.tag}`} className="froggy-panel__instruction">
+                      <p className="froggy-panel__explain">
+                        <code>{lesson.tag}</code> — {lesson.purpose}
+                      </p>
+                      <pre className="froggy-panel__snippet">{codeExample}</pre>
+                      <button type="button" className="froggy-panel__copy" onClick={() => void copyCode(codeExample)}>
+                        {copied === codeExample ? 'Copied!' : 'Copy code'}
+                      </button>
+                    </div>
+                  )
+                })
+              : (
+                <div className="froggy-panel__instruction">
+                  <pre className="froggy-panel__snippet">{fallbackExample}</pre>
+                  <button type="button" className="froggy-panel__copy" onClick={() => void copyCode(fallbackExample)}>
+                    {copied === fallbackExample ? 'Copied!' : 'Copy code'}
+                  </button>
+                </div>
+              )}
 
             {showJustifyHints && (
               <ul className="froggy-panel__hints">
@@ -167,8 +181,8 @@ export function CssLabFroggyGame({
             )}
 
             <div className="froggy-actions">
-              <button type="button" className="froggy-actions__hint" onClick={() => void copyCode(css || codeExample)}>
-                {copied ? 'Copied!' : 'Copy'}
+              <button type="button" className="froggy-actions__hint" onClick={() => void copyCode(css || fallbackExample)}>
+                {copied === (css || fallbackExample) ? 'Copied!' : 'Copy'}
               </button>
               <button type="button" className="froggy-actions__hint" onClick={onHint}>
                 Hint

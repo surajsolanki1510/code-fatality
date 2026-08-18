@@ -76,6 +76,31 @@
 }
 
 @media (max-width: 1100px) {
+  .learn-app {
+    padding: 0 0.85rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .quest-nav__back,
+  .quest-nav__link {
+    font-size: 1rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .learn-panel__title {
+    font-size: clamp(1.35rem, 5.5vw, 1.6rem);
+  }
+
+  .learn-panel__hook {
+    font-size: 1.05rem;
+  }
+
+  .fatality-editor__textarea--learn {
+    font-size: 1.12rem;
+    min-height: min(52vh, 420px);
+  }
+
   .learn-grid {
     grid-template-columns: 1fr;
   }
