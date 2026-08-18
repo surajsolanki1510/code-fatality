@@ -2,7 +2,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArenaShell } from '../components/ArenaShell'
 import { MapNav } from '../components/QuestNav'
 import {
-  getChapterProgress,
   getQuestsByTier,
   getQuestsForWorld,
   getTierProgress,
@@ -22,7 +21,6 @@ export function WorldDetailPage() {
   const completed = useProgressStore((s) => s.completedQuestIds)
 
   const world = WORLDS.find((w) => w.id === worldId)
-  const progress = worldId ? getChapterProgress(worldId, completed) : null
   const showTiers = worldId === 'html-village' || worldId === 'css-forest'
   const tiers: SkillTier[] = ALL_TIERS
 
@@ -43,20 +41,9 @@ export function WorldDetailPage() {
         <div className="world-detail-hero__art" style={{ backgroundImage: `url(${world.art})` }} />
         <div className="world-detail-hero__shade" />
         <div className="world-detail-hero__copy">
-          <p className="arena-subtitle" style={{ letterSpacing: '0.25em', fontSize: '1.1rem' }}>
-            {world.subtitle}
-          </p>
-          <h1 className="arena-title arena-title--section" style={{ marginTop: '0.35rem' }}>
+          <h1 className="arena-title arena-title--section" style={{ marginTop: 0 }}>
             {world.name}
           </h1>
-          <p className="arena-tagline" style={{ marginTop: '0.5rem', color: '#f2ebe0' }}>
-            {world.description}
-          </p>
-          {progress && (
-            <p className="arena-tagline" style={{ color: '#9ef0c0', marginTop: '0.35rem' }}>
-              {progress.done}/{progress.total} chapters cleared · unlock one-by-one
-            </p>
-          )}
           <p style={{ marginTop: '0.7rem' }}>
             <Link to={`/notebook/${world.id}`} className="quest-nav__brand">
               Open {world.name} Notebook →

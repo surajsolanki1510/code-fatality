@@ -633,18 +633,6 @@ export function QuestPage() {
               <h1 className="fatality-teach__title">{quest.title}</h1>
               <p className="fatality-teach__hook">{quest.hook}</p>
 
-              {quest.missionBrief && (
-                <div className="fatality-mission-brief">
-                  <h2>Build this</h2>
-                  <p>{quest.missionBrief}</p>
-                  {quest.realWorldWin && (
-                    <p className="fatality-mission-brief__real">
-                      <strong>Real world:</strong> {quest.realWorldWin}
-                    </p>
-                  )}
-                </div>
-              )}
-
               <div className="fatality-explain">
                 <h2>Instruction + code</h2>
                 {quest.tagLessons.slice(0, 1).map((lesson) => (

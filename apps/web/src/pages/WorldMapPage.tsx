@@ -50,10 +50,7 @@ export function WorldMapPage() {
                   />
                   <div className="fighter-card__shade" />
                   <div className="fighter-card__meta">
-                    <span className="fighter-card__slot">P{i + 1}</span>
                     <h2 className="fighter-card__name">{world.name}</h2>
-                    <p className="fighter-card__sub">{world.subtitle}</p>
-                    <p className="fighter-card__desc">{world.description}</p>
                   </div>
                   {!unlocked && <div className="fighter-card__lock">LOCKED</div>}
                   {unlocked && <div className="fighter-card__ready">READY</div>}

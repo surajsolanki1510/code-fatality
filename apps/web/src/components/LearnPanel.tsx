@@ -54,18 +54,6 @@ export function LearnPanel({ quest, checkResults }: Props) {
       <h1 className="learn-panel__title">{quest.title}</h1>
       <p className="learn-panel__hook">{quest.hook}</p>
 
-      {quest.missionBrief && (
-        <div className="learn-box learn-box--mission">
-          <h2 className="learn-box__heading">Build this</h2>
-          <p className="learn-box__text">{quest.missionBrief}</p>
-          {quest.realWorldWin && (
-            <p className="learn-box__text learn-box__real">
-              <strong>Real world:</strong> {quest.realWorldWin}
-            </p>
-          )}
-        </div>
-      )}
-
       <div className="mentor-bubble">
         <span className="mentor-bubble__name">{quest.speaker}</span>
         {quest.story.map((line) => (
