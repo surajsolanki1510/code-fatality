@@ -2,17 +2,22 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArenaShell } from '../components/ArenaShell'
 import { MapNav } from '../components/QuestNav'
+import { getQuestsForWorld, isQuestUnlocked } from '../data/quests'
 import { WORLDS, type WorldId } from '../data/worlds'
+import { useProgressStore } from '../store/progressStore'
 
 function getNotebookKey(worldId: WorldId) {
   return `codefatality.notebook.${worldId}`
 }
+
+const LAST_QUEST_KEY = 'codefatality.lastQuestByWorld'
 
 export function NotebookPage() {
   const navigate = useNavigate()
   const { worldId } = useParams<{ worldId: WorldId }>()
   const world = useMemo(() => WORLDS.find((w) => w.id === worldId), [worldId])
   const [notes, setNotes] = useState('')
+  const completedQuestIds = useProgressStore((s) => s.completedQuestIds)
 
   useEffect(() => {
     document.documentElement.classList.add('viewport-lock')
@@ -41,6 +46,15 @@ export function NotebookPage() {
   }
 
   const filename = `${world.id}-notebook.txt`
+  const questList = getQuestsForWorld(world.id)
+  const lastQuestByWorld = JSON.parse(localStorage.getItem(LAST_QUEST_KEY) || '{}') as Record<string, string>
+  const rememberedQuest = lastQuestByWorld[world.id]
+  const nextUnlocked = questList.find((q) => isQuestUnlocked(q, completedQuestIds) && !completedQuestIds.includes(q.id))
+  const fallbackQuest = questList.find((q) => isQuestUnlocked(q, completedQuestIds))
+  const resumeQuestId =
+    (rememberedQuest && questList.some((q) => q.id === rememberedQuest) ? rememberedQuest : undefined) ??
+    nextUnlocked?.id ??
+    fallbackQuest?.id
 
   return (
     <ArenaShell>
@@ -57,6 +71,11 @@ export function NotebookPage() {
             <Link to={`/world/${world.id}`} className="notebook-back-level">
               ← Back to {world.name}
             </Link>
+            {resumeQuestId && (
+              <Link to={`/quest/${resumeQuestId}`} className="notebook-back-level">
+                Resume quest →
+              </Link>
+            )}
             <button
               type="button"
               className="arena-btn arena-btn--gold notebook-download"

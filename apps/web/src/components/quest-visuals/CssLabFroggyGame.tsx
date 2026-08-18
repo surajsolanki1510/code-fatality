@@ -1,5 +1,6 @@
 import Editor from '@monaco-editor/react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { CSS_LAB_BY_ID } from '../../data/quests/cssLabs'
 import type { QuestDef } from '../../data/quests/types'
 import { UNLOCK_ALL_QUESTS } from '../../config/gameFlags'
@@ -44,6 +45,7 @@ export function CssLabFroggyGame({
   isPhone,
 }: Props) {
   const navigate = useNavigate()
+  const [copied, setCopied] = useState(false)
   const lab = CSS_LAB_BY_ID[quest.id]
   if (!lab) return null
 
@@ -53,6 +55,17 @@ export function CssLabFroggyGame({
   const total = quest.objectives.length
 
   const showJustifyHints = lab.board.mode === 'flex' && /justify-content/i.test(quest.missionBrief ?? '')
+  const codeExample = lesson?.example?.trim() || `${target} {\n  display: flex;\n}`
+
+  const copyCode = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1400)
+    } catch {
+      setCopied(false)
+    }
+  }
 
   return (
     <div className="froggy-game">
@@ -64,6 +77,9 @@ export function CssLabFroggyGame({
             <Link to={`/world/${quest.worldId}`} className="froggy-panel__back">
               ← Back
             </Link>
+            <Link to={`/notebook/${quest.worldId}`} className="froggy-panel__back froggy-panel__back--secondary">
+              Notebook
+            </Link>
             <h1 className="froggy-panel__title">{lab.gameTitle}</h1>
             <p className="froggy-panel__level">
               {lab.pack} · Level {quest.chapter}
@@ -73,7 +89,15 @@ export function CssLabFroggyGame({
           <div className="froggy-panel__body">
             <p className="froggy-panel__hook">{quest.hook}</p>
 
-            {lesson && <p className="froggy-panel__explain">{lesson.purpose}</p>}
+            {lesson && (
+              <div className="froggy-panel__instruction">
+                <p className="froggy-panel__explain">{lesson.purpose}</p>
+                <pre className="froggy-panel__snippet">{codeExample}</pre>
+                <button type="button" className="froggy-panel__copy" onClick={() => void copyCode(codeExample)}>
+                  {copied ? 'Copied!' : 'Copy code'}
+                </button>
+              </div>
+            )}
 
             {showJustifyHints && (
               <ul className="froggy-panel__hints">
@@ -143,6 +167,9 @@ export function CssLabFroggyGame({
             )}
 
             <div className="froggy-actions">
+              <button type="button" className="froggy-actions__hint" onClick={() => void copyCode(css || codeExample)}>
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
               <button type="button" className="froggy-actions__hint" onClick={onHint}>
                 Hint
               </button>
@@ -153,7 +180,7 @@ export function CssLabFroggyGame({
               ) : (
                 <button
                   type="button"
-                  className="froggy-actions__next"
+                  className="froggy-actions__next froggy-actions__next--done"
                   onClick={() => (nextQuestId ? navigate(`/quest/${nextQuestId}`) : navigate(`/world/${quest.worldId}`))}
                 >
                   {nextQuestId ? 'Next →' : 'Done ✓'}

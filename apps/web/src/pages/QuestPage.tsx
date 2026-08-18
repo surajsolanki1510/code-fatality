@@ -16,6 +16,8 @@ import { getQuestById, getQuestsForWorld, isQuestUnlocked } from '../data/quests
 import { buildPreviewDocument, validateQuest } from '../lib/validateQuest'
 import { useProgressStore } from '../store/progressStore'
 
+const LAST_QUEST_KEY = 'codefatality.lastQuestByWorld'
+
 export function QuestPage() {
   const { questId } = useParams<{ questId: string }>()
   const navigate = useNavigate()
@@ -130,7 +132,7 @@ export function QuestPage() {
     return buildPreviewDocument(htmlSource, cssSource)
   }, [portfolioHtml, deferredHtml, deferredCss, quest, isCssForest, isCssLab])
 
-  const [colSplit, setColSplit] = useState(0.48)
+  const [colSplit, setColSplit] = useState(0.58)
   const [focusMode, setFocusMode] = useState(false)
   const editorLanguage = quest?.starterCss !== undefined ? 'css' : 'html'
   const editorValue = editorLanguage === 'css' ? css : html
@@ -139,7 +141,7 @@ export function QuestPage() {
   const editorOptions = useMemo(
     () => ({
       fontFamily: 'Consolas, monospace',
-      fontSize: isPhone ? 13 : 14,
+      fontSize: isPhone ? 15 : 16,
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
       wordWrap: 'on' as const,
@@ -177,6 +179,18 @@ export function QuestPage() {
     }
     return 'Fear is on the ropes. Smash LOCK IN for FATALITY.'
   }, [quest, lockOutcome, passedCount, totalCount])
+
+  useEffect(() => {
+    if (!quest) return
+    const prevRaw = localStorage.getItem(LAST_QUEST_KEY)
+    const prev = prevRaw ? (JSON.parse(prevRaw) as Record<string, string>) : {}
+    prev[quest.worldId] = quest.id
+    localStorage.setItem(LAST_QUEST_KEY, JSON.stringify(prev))
+  }, [quest])
+
+  const copyText = useCallback(async (text: string) => {
+    await navigator.clipboard.writeText(text)
+  }, [])
 
   const runCheck = useCallback(() => {
     if (!quest) return
@@ -277,6 +291,8 @@ export function QuestPage() {
     const lesson = quest.tagLessons[0]
     const isLaunch = quest.id === 'css-p-e-boss'
     const showLaunch = isLaunch && (lockOutcome === 'win' || alreadyDone)
+    const htmlStructureSnippet = `<header>\n  <h1>Your Name</h1>\n  <p>Your role / tagline</p>\n</header>\n\n<main>\n  <section id="about"></section>\n  <section id="projects"></section>\n  <section id="contact"></section>\n</main>`
+    const lessonSnippet = lesson?.example?.trim() || ''
 
     const onColResizeStart = (e: ReactMouseEvent) => {
       e.preventDefault()
@@ -310,6 +326,8 @@ export function QuestPage() {
         )}
         <header className="pf-game__nav">
           <Link to={`/world/${quest.worldId}`}>← Portfolio</Link>
+          <Link to="/map">Map</Link>
+          <Link to={`/notebook/${quest.worldId}`}>Notebook</Link>
           <span className="pf-game__brand">PORTFOLIO FORGE</span>
           <button
             type="button"
@@ -343,26 +361,43 @@ export function QuestPage() {
             <div className="pf-lesson__scroll">
               <span className="pf-lesson__pack">{packLabel} · {quest.tier}</span>
               <h1 className="pf-lesson__title">{quest.title}</h1>
-              <p className="pf-lesson__hook">{quest.hook}</p>
 
               <div className="pf-lesson__job">
-                <h2>Write this in your site</h2>
+                <h2>Instruction</h2>
                 <p>{quest.missionBrief}</p>
               </div>
 
               {lesson && (
                 <div className="pf-lesson__note">
-                  <code>{lesson.tag}</code>
-                  <p>{lesson.purpose}</p>
+                  <code>Use: {lesson.tag}</code>
                   <pre>{lesson.example}</pre>
+                  <button
+                    type="button"
+                    className="pf-code__btn pf-code__btn--ghost"
+                    onClick={() =>
+                      void copyText(lessonSnippet).then(() => setFeedback({ type: 'win', text: 'Snippet copied.' }))
+                    }
+                  >
+                    Copy code
+                  </button>
                 </div>
               )}
 
-              {quest.tagLessons[1] && (
+              {codeLang === 'html' && (
                 <div className="pf-lesson__note">
-                  <code>{quest.tagLessons[1].tag}</code>
-                  <p>{quest.tagLessons[1].purpose}</p>
-                  <pre>{quest.tagLessons[1].example}</pre>
+                  <code>Where to place tags</code>
+                  <pre>{htmlStructureSnippet}</pre>
+                  <button
+                    type="button"
+                    className="pf-code__btn pf-code__btn--ghost"
+                    onClick={() =>
+                      void copyText(htmlStructureSnippet).then(() =>
+                        setFeedback({ type: 'win', text: 'HTML layout template copied.' }),
+                      )
+                    }
+                  >
+                    Copy layout
+                  </button>
                 </div>
               )}
 
@@ -481,6 +516,15 @@ export function QuestPage() {
             </div>
             <div className="pf-code__bar pf-code__bar--desktop">
               <span>index.html / styles.css</span>
+              <button
+                type="button"
+                className="pf-code__btn pf-code__btn--ghost"
+                onClick={() =>
+                  void copyText(codeLang === 'css' ? css : html).then(() => setFeedback({ type: 'win', text: 'Code copied.' }))
+                }
+              >
+                Copy code
+              </button>
               <button type="button" className="pf-code__btn pf-code__btn--ghost" onClick={showHint}>
                 Hint
               </button>
@@ -503,6 +547,15 @@ export function QuestPage() {
         </div>
 
         <div className="pf-phone-actions">
+          <button
+            type="button"
+            className="pf-code__btn pf-code__btn--ghost"
+            onClick={() =>
+              void copyText(codeLang === 'css' ? css : html).then(() => setFeedback({ type: 'win', text: 'Code copied.' }))
+            }
+          >
+            Copy
+          </button>
           <button type="button" className="pf-code__btn pf-code__btn--ghost" onClick={showHint}>
             Hint
           </button>
@@ -593,42 +646,19 @@ export function QuestPage() {
               )}
 
               <div className="fatality-explain">
-                <h2>How the code works</h2>
-                <p>{quest.lessonSummary}</p>
-                {quest.tagLessons.map((lesson) => (
+                <h2>Instruction + code</h2>
+                {quest.tagLessons.slice(0, 1).map((lesson) => (
                   <article key={`${quest.id}-${lesson.tag}`} className="fatality-tag-card">
-                    <code>{lesson.tag}</code>
-                    <p>
-                      <strong>What is this?</strong> {lesson.purpose}
-                    </p>
-                    {lesson.why && (
-                      <p>
-                        <strong>Why?</strong> {lesson.why}
-                      </p>
-                    )}
-                    {lesson.whenToUse && (
-                      <p>
-                        <strong>When?</strong> {lesson.whenToUse}
-                      </p>
-                    )}
-                    {lesson.attributes && lesson.attributes.length > 0 && (
-                      <div className="fatality-tag-card__attrs">
-                        <strong>Extra options</strong>
-                        <ul>
-                          {lesson.attributes.map((attr) => (
-                            <li key={attr.name}>
-                              <code>{attr.name}</code> — {attr.meaning}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    <code>Use this tag: {lesson.tag}</code>
+                    <p>{lesson.purpose}</p>
                     <pre>{lesson.example}</pre>
-                    {lesson.mistake && (
-                      <p className="fatality-tag-card__mistake">
-                        <strong>Don&apos;t do this:</strong> {lesson.mistake}
-                      </p>
-                    )}
+                    <button
+                      type="button"
+                      className="fatality-editor__btn fatality-editor__btn--ghost"
+                      onClick={() => void copyText(lesson.example).then(() => setFeedback({ type: 'win', text: 'Snippet copied.' }))}
+                    >
+                      Copy code
+                    </button>
                   </article>
                 ))}
               </div>
@@ -674,6 +704,15 @@ export function QuestPage() {
           <div className={`fatality-editor${phoneTab === 'code' ? ' is-phone-on' : ''}`}>
             <div className="fatality-editor__bar fatality-editor__bar--desktop">
               <span className="fatality-editor__label">Your code</span>
+              <button
+                type="button"
+                className="fatality-editor__btn fatality-editor__btn--ghost"
+                onClick={() =>
+                  void copyText(editorValue).then(() => setFeedback({ type: 'win', text: 'Code copied.' }))
+                }
+              >
+                Copy code
+              </button>
               <button type="button" className="fatality-editor__btn fatality-editor__btn--ghost" onClick={showHint}>
                 Hint
               </button>
@@ -740,6 +779,13 @@ export function QuestPage() {
         </div>
 
         <div className="fatality-phone-actions">
+          <button
+            type="button"
+            className="fatality-editor__btn fatality-editor__btn--ghost"
+            onClick={() => void copyText(editorValue).then(() => setFeedback({ type: 'win', text: 'Code copied.' }))}
+          >
+            Copy
+          </button>
           <button type="button" className="fatality-editor__btn fatality-editor__btn--ghost" onClick={showHint}>
             Hint
           </button>
@@ -771,6 +817,12 @@ export function QuestPage() {
           <div className="learn-workspace__toolbar">
             <span className="learn-workspace__label">Your code</span>
             <div className="learn-workspace__actions">
+              <ArenaButton
+                variant="ghost"
+                onClick={() => void copyText(editorValue).then(() => setFeedback({ type: 'win', text: 'Code copied.' }))}
+              >
+                Copy code
+              </ArenaButton>
               <ArenaButton
                 variant="ghost"
                 onClick={() => {

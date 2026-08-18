@@ -450,8 +450,8 @@ body:has(.pf-game),
 
 .pf-code__hint {
   margin: 0;
-  padding: 0.2rem 0.65rem;
-  font-size: 0.68rem;
+  padding: 0.3rem 0.72rem;
+  font-size: 0.84rem;
   color: #8a7a82;
   background: #1a1218;
 }
@@ -476,6 +476,7 @@ body:has(.pf-game),
 .pf-code__editor {
   flex: 1;
   min-height: 0;
+  min-height: 360px;
 }
 
 .pf-code__bar {
@@ -502,7 +503,7 @@ body:has(.pf-game),
   padding: 0.4rem 0.85rem;
   font-family: inherit;
   font-weight: 800;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   letter-spacing: 0.05em;
   cursor: pointer;
 }
@@ -696,5 +697,18 @@ body:has(.pf-game),
 
   .pf-game.is-phone-build .pf-code.is-phone-on {
     grid-row: 2;
+  }
+
+  .pf-code__hint {
+    font-size: 0.92rem;
+  }
+
+  .pf-code__editor {
+    min-height: 280px;
+  }
+
+  .pf-code .fatality-editor__textarea {
+    font-size: 1rem;
+    line-height: 1.45;
   }
 }
